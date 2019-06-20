@@ -1,0 +1,590 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
+		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
+		D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D56A12F622BB9D2C0083E2B9 /* Main.storyboard */; };
+		D56A12FA22BB9D2E0083E2B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */; };
+		D56A12FD22BB9D2E0083E2B9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */; };
+		D56A130022BB9D2E0083E2B9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12FF22BB9D2E0083E2B9 /* main.m */; };
+		D56A130A22BB9D2E0083E2B9 /* SecretNovelsProTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A130922BB9D2E0083E2B9 /* SecretNovelsProTests.m */; };
+		D56A131522BB9D2E0083E2B9 /* SecretNovelsProUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */; };
+		D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */ = {isa = PBXBuildFile; fileRef = D56A132222BB9D3B0083E2B9 /* redImage.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D56A130622BB9D2E0083E2B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D56A12E522BB9D2C0083E2B9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D56A12EC22BB9D2C0083E2B9;
+			remoteInfo = SecretNovelsPro;
+		};
+		D56A131122BB9D2E0083E2B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D56A12E522BB9D2C0083E2B9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D56A12EC22BB9D2C0083E2B9;
+			remoteInfo = SecretNovelsPro;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecretNovelsPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D56A12F322BB9D2C0083E2B9 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		D56A12F422BB9D2C0083E2B9 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D56A12F722BB9D2C0083E2B9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D56A12FC22BB9D2E0083E2B9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D56A12FE22BB9D2E0083E2B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D56A12FF22BB9D2E0083E2B9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D56A130522BB9D2E0083E2B9 /* SecretNovelsProTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecretNovelsProTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D56A130922BB9D2E0083E2B9 /* SecretNovelsProTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecretNovelsProTests.m; sourceTree = "<group>"; };
+		D56A130B22BB9D2E0083E2B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D56A131022BB9D2E0083E2B9 /* SecretNovelsProUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecretNovelsProUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecretNovelsProUITests.m; sourceTree = "<group>"; };
+		D56A131622BB9D2E0083E2B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D56A132222BB9D3B0083E2B9 /* redImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redImage.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D56A12EA22BB9D2C0083E2B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130222BB9D2E0083E2B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130D22BB9D2E0083E2B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D56A12E422BB9D2C0083E2B9 = {
+			isa = PBXGroup;
+			children = (
+				D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */,
+				D56A130822BB9D2E0083E2B9 /* SecretNovelsProTests */,
+				D56A131322BB9D2E0083E2B9 /* SecretNovelsProUITests */,
+				D56A12EE22BB9D2C0083E2B9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D56A12EE22BB9D2C0083E2B9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */,
+				D56A130522BB9D2E0083E2B9 /* SecretNovelsProTests.xctest */,
+				D56A131022BB9D2E0083E2B9 /* SecretNovelsProUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
+			isa = PBXGroup;
+			children = (
+				D56A132222BB9D3B0083E2B9 /* redImage.png */,
+				D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */,
+				D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */,
+				D56A12F322BB9D2C0083E2B9 /* ViewController.h */,
+				D56A12F422BB9D2C0083E2B9 /* ViewController.m */,
+				D56A12F622BB9D2C0083E2B9 /* Main.storyboard */,
+				D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */,
+				D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */,
+				D56A12FE22BB9D2E0083E2B9 /* Info.plist */,
+				D56A12FF22BB9D2E0083E2B9 /* main.m */,
+			);
+			path = SecretNovelsPro;
+			sourceTree = "<group>";
+		};
+		D56A130822BB9D2E0083E2B9 /* SecretNovelsProTests */ = {
+			isa = PBXGroup;
+			children = (
+				D56A130922BB9D2E0083E2B9 /* SecretNovelsProTests.m */,
+				D56A130B22BB9D2E0083E2B9 /* Info.plist */,
+			);
+			path = SecretNovelsProTests;
+			sourceTree = "<group>";
+		};
+		D56A131322BB9D2E0083E2B9 /* SecretNovelsProUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */,
+				D56A131622BB9D2E0083E2B9 /* Info.plist */,
+			);
+			path = SecretNovelsProUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D56A12EC22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D56A131922BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsPro" */;
+			buildPhases = (
+				D56A12E922BB9D2C0083E2B9 /* Sources */,
+				D56A12EA22BB9D2C0083E2B9 /* Frameworks */,
+				D56A12EB22BB9D2C0083E2B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SecretNovelsPro;
+			productName = SecretNovelsPro;
+			productReference = D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D56A130422BB9D2E0083E2B9 /* SecretNovelsProTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D56A131C22BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsProTests" */;
+			buildPhases = (
+				D56A130122BB9D2E0083E2B9 /* Sources */,
+				D56A130222BB9D2E0083E2B9 /* Frameworks */,
+				D56A130322BB9D2E0083E2B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D56A130722BB9D2E0083E2B9 /* PBXTargetDependency */,
+			);
+			name = SecretNovelsProTests;
+			productName = SecretNovelsProTests;
+			productReference = D56A130522BB9D2E0083E2B9 /* SecretNovelsProTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D56A130F22BB9D2E0083E2B9 /* SecretNovelsProUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D56A131F22BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsProUITests" */;
+			buildPhases = (
+				D56A130C22BB9D2E0083E2B9 /* Sources */,
+				D56A130D22BB9D2E0083E2B9 /* Frameworks */,
+				D56A130E22BB9D2E0083E2B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D56A131222BB9D2E0083E2B9 /* PBXTargetDependency */,
+			);
+			name = SecretNovelsProUITests;
+			productName = SecretNovelsProUITests;
+			productReference = D56A131022BB9D2E0083E2B9 /* SecretNovelsProUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D56A12E522BB9D2C0083E2B9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = zhaohongbin;
+				TargetAttributes = {
+					D56A12EC22BB9D2C0083E2B9 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					D56A130422BB9D2E0083E2B9 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = D56A12EC22BB9D2C0083E2B9;
+					};
+					D56A130F22BB9D2E0083E2B9 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = D56A12EC22BB9D2C0083E2B9;
+					};
+				};
+			};
+			buildConfigurationList = D56A12E822BB9D2C0083E2B9 /* Build configuration list for PBXProject "SecretNovelsPro" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D56A12E422BB9D2C0083E2B9;
+			productRefGroup = D56A12EE22BB9D2C0083E2B9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D56A12EC22BB9D2C0083E2B9 /* SecretNovelsPro */,
+				D56A130422BB9D2E0083E2B9 /* SecretNovelsProTests */,
+				D56A130F22BB9D2E0083E2B9 /* SecretNovelsProUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D56A12EB22BB9D2C0083E2B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D56A12FD22BB9D2E0083E2B9 /* LaunchScreen.storyboard in Resources */,
+				D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */,
+				D56A12FA22BB9D2E0083E2B9 /* Assets.xcassets in Resources */,
+				D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130322BB9D2E0083E2B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130E22BB9D2E0083E2B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D56A12E922BB9D2C0083E2B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
+				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
+				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130122BB9D2E0083E2B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D56A130A22BB9D2E0083E2B9 /* SecretNovelsProTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D56A130C22BB9D2E0083E2B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D56A131522BB9D2E0083E2B9 /* SecretNovelsProUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D56A130722BB9D2E0083E2B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D56A12EC22BB9D2C0083E2B9 /* SecretNovelsPro */;
+			targetProxy = D56A130622BB9D2E0083E2B9 /* PBXContainerItemProxy */;
+		};
+		D56A131222BB9D2E0083E2B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D56A12EC22BB9D2C0083E2B9 /* SecretNovelsPro */;
+			targetProxy = D56A131122BB9D2E0083E2B9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D56A12F622BB9D2C0083E2B9 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D56A12F722BB9D2C0083E2B9 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D56A12FC22BB9D2E0083E2B9 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D56A131722BB9D2E0083E2B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D56A131822BB9D2E0083E2B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D56A131A22BB9D2E0083E2B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsPro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D56A131B22BB9D2E0083E2B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsPro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D56A131D22BB9D2E0083E2B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsProTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsProTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SecretNovelsPro.app/SecretNovelsPro";
+			};
+			name = Debug;
+		};
+		D56A131E22BB9D2E0083E2B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsProTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsProTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SecretNovelsPro.app/SecretNovelsPro";
+			};
+			name = Release;
+		};
+		D56A132022BB9D2E0083E2B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsProUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsProUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SecretNovelsPro;
+			};
+			name = Debug;
+		};
+		D56A132122BB9D2E0083E2B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				INFOPLIST_FILE = SecretNovelsProUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsProUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SecretNovelsPro;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D56A12E822BB9D2C0083E2B9 /* Build configuration list for PBXProject "SecretNovelsPro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D56A131722BB9D2E0083E2B9 /* Debug */,
+				D56A131822BB9D2E0083E2B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D56A131922BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsPro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D56A131A22BB9D2E0083E2B9 /* Debug */,
+				D56A131B22BB9D2E0083E2B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D56A131C22BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsProTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D56A131D22BB9D2E0083E2B9 /* Debug */,
+				D56A131E22BB9D2E0083E2B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D56A131F22BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "SecretNovelsProUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D56A132022BB9D2E0083E2B9 /* Debug */,
+				D56A132122BB9D2E0083E2B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D56A12E522BB9D2C0083E2B9 /* Project object */;
+}
