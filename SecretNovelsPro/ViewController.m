@@ -191,7 +191,9 @@
         
     }else if (textField == _tf2){
         if (_tf1.text.length > 0 && _tf2.text.length > 0) {
-            NSArray *otherChars = @[@"",@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　"];
+            
+            _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
+            NSArray *otherChars = @[@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　"];
             for (int i = 1; i < _tf1.text.length; i++) {
                 for (NSString *oneChar in otherChars) {
                     NSMutableString *str = [_tf1.text mutableCopy];
