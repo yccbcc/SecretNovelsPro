@@ -7,8 +7,9 @@
 //
 
 #import "ViewController.h"
+#import <WebKit/WebKit.h>
 
-@interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate>
+@interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate,WKUIDelegate,WKNavigationDelegate>
 
 @end
 
@@ -22,6 +23,10 @@
     UITextField *_tf2;
     
     UITextView *_textView;
+    
+    UIButton *_bgBtn;
+    WKWebView *_wkWeb;
+    UITextView *_readTXTView;
     
     float _searchOffset;
     NSInteger _strCount;
@@ -79,6 +84,13 @@
     [self.view addSubview:tf2];
     _tf2 = tf2;
     
+    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, 70, 40, 40)];
+    [webBtn addTarget:self action:@selector(showWebClick) forControlEvents:UIControlEventTouchUpInside];
+    [webBtn setTitle:@"Web" forState:UIControlStateNormal];
+    webBtn.backgroundColor=UIColor.blueColor;
+    [webBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    [self.view addSubview:webBtn];
+    
     NSArray *arr = [[NSUserDefaults standardUserDefaults] valueForKey:@"names"];
     if (arr) {
         _mArr = [NSMutableArray arrayWithArray:arr];
@@ -113,6 +125,12 @@
         tv.hidden = YES;
         tv;
     });
+}
+- (void)showWebClick{
+    if (_wkWeb && _bgBtn) {
+        _bgBtn.hidden = NO;
+        _wkWeb.hidden = NO;
+    }
 }
 
 - (void)searchClick{
@@ -250,33 +268,90 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 375, [UIScreen mainScreen].bounds.size.height)];
-    btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
-    btn.tag = 1000 + indexPath.row;
-    [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
-    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 50, 375, btn.frame.size.height - 50)];
-    textView.tag = 123;
-    textView.delegate = self;
-    [btn addSubview:textView];
-    [[UIApplication sharedApplication].delegate.window addSubview:btn];
-    textView.text = _mArr[indexPath.row][@"value"];
-    NSString *offsetY = _mArr[indexPath.row][@"offsety"];
-    if (offsetY.integerValue != 0) {
-        textView.contentOffset = CGPointMake(0, offsetY.integerValue);
+    if (_bgBtn) {
+        _bgBtn.hidden = NO;
+    }else{
+        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 375, [UIScreen mainScreen].bounds.size.height)];
+        btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
+       
+        [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
+        [[UIApplication sharedApplication].delegate.window addSubview:btn];
+        _bgBtn = btn;
+        
+        UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, 50)];
+        backBtn.tag = 200;
+        backBtn.backgroundColor = UIColor.blueColor;
+        [backBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:backBtn];
+        
+        UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, 0, 80, 50)];
+        nextBtn.backgroundColor = UIColor.blueColor;
+        [nextBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:nextBtn];
     }
-}
-- (void)removeReader{
-    for (UIView *btn in  [UIApplication sharedApplication].delegate.window.subviews) {
-        if (btn.tag >= 1000) {
-            UITextView *txtView = [btn viewWithTag:123];
-            NSMutableDictionary *dict = [_mArr[btn.tag - 1000] mutableCopy];
-            dict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)txtView.contentOffset.y];
-            [_mArr removeObjectAtIndex:btn.tag - 1000];
-            [_mArr insertObject:dict atIndex:btn.tag - 1000];
-            [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
-            [btn removeFromSuperview];
+    _bgBtn.tag = 1000 + indexPath.row;
+
+   NSString *key = _mArr[indexPath.row][@"key"];
+    if ([key hasPrefix:@"http"]) {
+        
+        if (_wkWeb) {
+            _wkWeb.hidden = NO;
+        }else{
+            WKWebView *wkWeb = [[WKWebView alloc] initWithFrame:CGRectMake(0, 50, 375, _bgBtn.frame.size.height - 50) configuration:[[WKWebViewConfiguration alloc] init]];
+            [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
+            wkWeb.tag = 123;
+            wkWeb.UIDelegate = self;
+            _wkWeb = wkWeb;
+            [_bgBtn addSubview:wkWeb];
+        }
+    }else{
+
+        if (_readTXTView) {
+            _readTXTView.hidden = NO;
+        }else{
+            UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 50, 375, _bgBtn.frame.size.height - 50)];
+            textView.tag = 123;
+            textView.delegate = self;
+            [_bgBtn addSubview:textView];
+            textView.text = _mArr[indexPath.row][@"value"];
+            NSString *offsetY = _mArr[indexPath.row][@"offsety"];
+            if (offsetY.integerValue != 0) {
+                textView.contentOffset = CGPointMake(0, offsetY.integerValue);
+            }
+            _readTXTView = textView;
         }
     }
+}
+
+- (void)directedClick:(UIButton *)btn{
+    if (_wkWeb.isHidden == NO) {
+        if (btn.tag == 200) {
+            if ([_wkWeb canGoBack]) {
+                [_wkWeb goBack];
+            }
+        }else{
+            if ([_wkWeb canGoForward]) {
+                [_wkWeb goForward];
+            }
+        }
+    }
+}
+
+- (void)removeReader{
+    
+    NSString *key = _mArr[_bgBtn.tag - 1000][@"key"];
+    if ([key hasPrefix:@"http"]) {
+        _wkWeb.hidden = YES;
+    }else{
+        NSMutableDictionary *dict = [_mArr[_bgBtn.tag - 1000] mutableCopy];
+        dict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)_readTXTView.contentOffset.y];
+        [_mArr removeObjectAtIndex:_bgBtn.tag - 1000];
+        [_mArr insertObject:dict atIndex:_bgBtn.tag - 1000];
+        [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
+        _readTXTView.hidden = YES;
+    }
+    _bgBtn.hidden = YES;
+    
 }
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
