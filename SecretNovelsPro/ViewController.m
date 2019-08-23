@@ -11,6 +11,8 @@
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate,WKUIDelegate,WKNavigationDelegate>
 
+#define statusBarHeight [UIApplication sharedApplication].statusBarFrame.size.height
+
 @end
 
 @implementation ViewController
@@ -36,10 +38,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    
+    
     _searchOffset = 0.0;
     _oriTF1Str = @"";
     
-    UITextField *tf = [[UITextField alloc] initWithFrame:CGRectMake(50, 20, 140, 40)];
+    UITextField *tf = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight, 140, 40)];
     tf.placeholder = @"请输入";
     tf.returnKeyType = UIReturnKeyDone;
     tf.borderStyle = UITextBorderStyleRoundedRect;
@@ -47,21 +51,21 @@
     [self.view addSubview:tf];
     _tf = tf;
     
-    UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(200, 20, 50, 40)];
+    UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(200, statusBarHeight, 50, 40)];
     [btn2 addTarget:self action:@selector(refreshClick) forControlEvents:UIControlEventTouchUpInside];
     [btn2 setTitle:@"更新" forState:UIControlStateNormal];
     [btn2 setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
     btn2.backgroundColor = [UIColor blueColor];
     [self.view addSubview:btn2];
     
-    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(260, 20, 50, 40)];
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(260, statusBarHeight, 50, 40)];
     [btn addTarget:self action:@selector(fetchClick) forControlEvents:UIControlEventTouchUpInside];
     [btn setTitle:@"获取" forState:UIControlStateNormal];
     [btn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
     btn.backgroundColor = [UIColor blueColor];
     [self.view addSubview:btn];
     
-    UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(50, 70, 100, 40)];
+    UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight + 50, 100, 40)];
     tf1.placeholder = @"被替换";
     tf1.returnKeyType = UIReturnKeyDone;
     tf1.borderStyle = UITextBorderStyleRoundedRect;
@@ -69,14 +73,14 @@
     [self.view addSubview:tf1];
     _tf1 = tf1;
     
-    UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(155, 70, 60, 40)];
+    UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(155, statusBarHeight + 50, 60, 40)];
     [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
     [searchBtn setTitle:@"搜索" forState:UIControlStateNormal];
     searchBtn.backgroundColor=UIColor.blueColor;
     [searchBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
     [self.view addSubview:searchBtn];
     
-    UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(220, 70, 100, 40)];
+    UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(220, statusBarHeight + 50, 100, 40)];
     tf2.placeholder = @"替换者";
     tf2.returnKeyType = UIReturnKeyDone;
     tf2.borderStyle = UITextBorderStyleRoundedRect;
@@ -84,7 +88,7 @@
     [self.view addSubview:tf2];
     _tf2 = tf2;
     
-    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, 70, 40, 40)];
+    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, statusBarHeight + 50, 40, 40)];
     [webBtn addTarget:self action:@selector(showWebClick) forControlEvents:UIControlEventTouchUpInside];
     [webBtn setTitle:@"Web" forState:UIControlStateNormal];
     webBtn.backgroundColor=UIColor.blueColor;
@@ -98,7 +102,7 @@
         _mArr = [@[] mutableCopy];
     }
     
-    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 120, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 120)];
+    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 100 + statusBarHeight, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 100 - statusBarHeight - 34)];
     textView.delegate = self;
     textView.font = [UIFont systemFontOfSize:12];
     textView.layer.borderColor = [UIColor lightGrayColor].CGColor;
@@ -118,7 +122,8 @@
             // Fallback on earlier versions
         }
         UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, tv.frame.size.width, 64)];
-        btn.backgroundColor = [UIColor grayColor];
+        btn.backgroundColor = [UIColor lightGrayColor];
+        [btn setTitle:@"返回" forState:UIControlStateNormal];
         [btn addTarget:self action:@selector(btnClick) forControlEvents:UIControlEventTouchUpInside];
         tv.tableHeaderView = btn;
         [self.view addSubview:tv];
@@ -271,21 +276,25 @@
     if (_bgBtn) {
         _bgBtn.hidden = NO;
     }else{
-        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 375, [UIScreen mainScreen].bounds.size.height)];
+        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
         btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
        
         [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
         [[UIApplication sharedApplication].delegate.window addSubview:btn];
         _bgBtn = btn;
         
-        UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, 50)];
+        UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, statusBarHeight, 80, 50)];
         backBtn.tag = 200;
-        backBtn.backgroundColor = UIColor.blueColor;
+        backBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
+        [backBtn setTitle:@"上一页" forState:UIControlStateNormal];
+        [backBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
         [backBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:backBtn];
         
-        UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, 0, 80, 50)];
-        nextBtn.backgroundColor = UIColor.blueColor;
+        UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, statusBarHeight, 80, 50)];
+        [nextBtn setTitle:@"下一页" forState:UIControlStateNormal];
+        [nextBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        nextBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
         [nextBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:nextBtn];
     }
@@ -296,11 +305,13 @@
         
         if (_wkWeb) {
             _wkWeb.hidden = NO;
+            [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
         }else{
-            WKWebView *wkWeb = [[WKWebView alloc] initWithFrame:CGRectMake(0, 50, 375, _bgBtn.frame.size.height - 50) configuration:[[WKWebViewConfiguration alloc] init]];
+            WKWebView *wkWeb = [[WKWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
             [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
             wkWeb.tag = 123;
             wkWeb.UIDelegate = self;
+            wkWeb.navigationDelegate = self;
             _wkWeb = wkWeb;
             [_bgBtn addSubview:wkWeb];
         }
@@ -308,8 +319,9 @@
 
         if (_readTXTView) {
             _readTXTView.hidden = NO;
+             _readTXTView.text = _mArr[indexPath.row][@"value"];
         }else{
-            UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 50, 375, _bgBtn.frame.size.height - 50)];
+            UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50))];
             textView.tag = 123;
             textView.delegate = self;
             [_bgBtn addSubview:textView];
@@ -359,6 +371,35 @@
         return NO;
     }
     return YES;
+}
+
+#pragma mark - webviewdelegate
+- (nullable WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+    // 支持window.open(),需要打开新界面是,WKWebView的代理```WKUIDelegate```方法
+    // 会拦截到window.open()事件. 只需要我们在在方法内进行处理
+    if (!navigationAction.targetFrame.isMainFrame) {
+        [webView loadRequest:navigationAction.request];
+    }
+    return nil;
+}
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
+//    //获取所有的html
+//    NSString *allHtml = @"document.documentElement.innerHTML";
+//    //获取网页title
+//    NSString *htmlTitle = @"document.title";
+//    //获取网页的一个值
+//    NSString *htmlNum = @"document.getElementById('title').innerText";
+//
+//    [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+//        NSString *a = result;
+//
+//
+//
+//    }];
 }
 
 #pragma mark - tool
