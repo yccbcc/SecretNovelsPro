@@ -16,6 +16,8 @@
 		D56A130A22BB9D2E0083E2B9 /* SecretNovelsProTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A130922BB9D2E0083E2B9 /* SecretNovelsProTests.m */; };
 		D56A131522BB9D2E0083E2B9 /* SecretNovelsProUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */; };
 		D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */ = {isa = PBXBuildFile; fileRef = D56A132222BB9D3B0083E2B9 /* redImage.png */; };
+		D5FFCAAC231CF41400B965DA /* iOS开发常用.txt in Resources */ = {isa = PBXBuildFile; fileRef = D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */; };
+		D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = D5FFCAB0231D047800B965DA /* TSWebView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,9 @@
 		D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecretNovelsProUITests.m; sourceTree = "<group>"; };
 		D56A131622BB9D2E0083E2B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D56A132222BB9D3B0083E2B9 /* redImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redImage.png; sourceTree = "<group>"; };
+		D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iOS开发常用.txt"; sourceTree = "<group>"; };
+		D5FFCAAF231D047800B965DA /* TSWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSWebView.h; sourceTree = "<group>"; };
+		D5FFCAB0231D047800B965DA /* TSWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSWebView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,11 +108,14 @@
 		D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
 			isa = PBXGroup;
 			children = (
+				D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */,
 				D56A132222BB9D3B0083E2B9 /* redImage.png */,
 				D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */,
 				D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */,
 				D56A12F322BB9D2C0083E2B9 /* ViewController.h */,
 				D56A12F422BB9D2C0083E2B9 /* ViewController.m */,
+				D5FFCAAF231D047800B965DA /* TSWebView.h */,
+				D5FFCAB0231D047800B965DA /* TSWebView.m */,
 				D56A12F622BB9D2C0083E2B9 /* Main.storyboard */,
 				D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */,
 				D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */,
@@ -242,6 +250,7 @@
 				D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */,
 				D56A12FA22BB9D2E0083E2B9 /* Assets.xcassets in Resources */,
 				D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */,
+				D5FFCAAC231CF41400B965DA /* iOS开发常用.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +277,7 @@
 			files = (
 				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
 				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
+				D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */,
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -327,6 +337,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -386,6 +397,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

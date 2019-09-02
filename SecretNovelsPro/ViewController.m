@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import <WebKit/WebKit.h>
+#import "TSWebView.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate,WKUIDelegate,WKNavigationDelegate>
 
@@ -27,18 +28,18 @@
     UITextView *_textView;
     
     UIButton *_bgBtn;
-    WKWebView *_wkWeb;
+    TSWebView *_wkWeb;
     UITextView *_readTXTView;
     
     float _searchOffset;
     NSInteger _strCount;
     NSString *_oriTF1Str;
+    
+    NSString *_resultString;  //加载的网页中的字符串
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
-    
     
     _searchOffset = 0.0;
     _oriTF1Str = @"";
@@ -110,7 +111,6 @@
     textView.textContainerInset = UIEdgeInsetsMake(0, -linePading, 200, -linePading);
     [self.view addSubview:textView];
     _textView=textView;
-
     
     _tv = ({
         UITableView *tv = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0) style:UITableViewStylePlain];
@@ -134,7 +134,7 @@
 - (void)showWebClick{
     if (_wkWeb && _bgBtn) {
         _bgBtn.hidden = NO;
-        _wkWeb.hidden = NO;
+        [_wkWeb showWeb];
     }
 }
 
@@ -288,26 +288,47 @@
         backBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
         [backBtn setTitle:@"上一页" forState:UIControlStateNormal];
         [backBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [backBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
         [backBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:backBtn];
         
         UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, statusBarHeight, 80, 50)];
+        nextBtn.tag = 201;
         [nextBtn setTitle:@"下一页" forState:UIControlStateNormal];
         [nextBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [nextBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
         nextBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
         [nextBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:nextBtn];
+        
+        UIButton *copyBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 180, statusBarHeight, 80, 50)];
+        copyBtn.tag = 202;
+        [copyBtn setTitle:@"copy" forState:UIControlStateNormal];
+        [copyBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [copyBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+        copyBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
+        [copyBtn addTarget:self action:@selector(copyClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:copyBtn];
     }
     _bgBtn.tag = 1000 + indexPath.row;
 
    NSString *key = _mArr[indexPath.row][@"key"];
     if ([key hasPrefix:@"http"]) {
         
+        UIButton *btn1 = [_bgBtn viewWithTag:200];
+        btn1.hidden = false;
+        UIButton *btn2 = [_bgBtn viewWithTag:201];
+        btn2.hidden = false;
+        UIButton *btn3 = [_bgBtn viewWithTag:202];
+        btn3.hidden = false;
+        
         if (_wkWeb) {
-            _wkWeb.hidden = NO;
             [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
+            //        NSString *path = [[NSBundle mainBundle] pathForResource:@"iOS开发常用.txt" ofType:nil];
+            //        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
+            //        [_wkWeb loadRequest:request];
         }else{
-            WKWebView *wkWeb = [[WKWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
+            TSWebView *wkWeb = [[TSWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
             [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
             wkWeb.tag = 123;
             wkWeb.UIDelegate = self;
@@ -315,7 +336,15 @@
             _wkWeb = wkWeb;
             [_bgBtn addSubview:wkWeb];
         }
+        [_wkWeb showWeb];
     }else{
+        
+        UIButton *btn1 = [_bgBtn viewWithTag:200];
+        btn1.hidden = true;
+        UIButton *btn2 = [_bgBtn viewWithTag:201];
+        btn2.hidden = true;
+        UIButton *btn3 = [_bgBtn viewWithTag:202];
+        btn3.hidden = true;
 
         if (_readTXTView) {
             _readTXTView.hidden = NO;
@@ -333,6 +362,11 @@
             _readTXTView = textView;
         }
     }
+}
+
+
+- (void)copyClick:(UIButton *)btn{
+    _textView.text = _resultString;
 }
 
 - (void)directedClick:(UIButton *)btn{
@@ -353,7 +387,7 @@
     
     NSString *key = _mArr[_bgBtn.tag - 1000][@"key"];
     if ([key hasPrefix:@"http"]) {
-        _wkWeb.hidden = YES;
+        [_wkWeb hideWeb];
     }else{
         NSMutableDictionary *dict = [_mArr[_bgBtn.tag - 1000] mutableCopy];
         dict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)_readTXTView.contentOffset.y];
@@ -387,19 +421,18 @@
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
-//    //获取所有的html
-//    NSString *allHtml = @"document.documentElement.innerHTML";
-//    //获取网页title
-//    NSString *htmlTitle = @"document.title";
-//    //获取网页的一个值
-//    NSString *htmlNum = @"document.getElementById('title').innerText";
-//
-//    [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-//        NSString *a = result;
-//
-//
-//
-//    }];
+    //获取所有的html
+    NSString *allHtml = @"document.documentElement.innerHTML";
+    //获取网页title
+    NSString *htmlTitle = @"document.title";
+    //获取网页的一个值
+    NSString *htmlNum = @"document.getElementById('title').innerText";
+
+    [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        if ([result isKindOfClass:[NSString class]]) {
+            self->_resultString = result;
+        }
+    }];
 }
 
 #pragma mark - tool
