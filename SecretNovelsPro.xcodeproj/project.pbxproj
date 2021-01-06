@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D53ABE742583803F006C45E1 /* ReatTxtManager.m */; };
 		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
 		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
 		D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D56A12F622BB9D2C0083E2B9 /* Main.storyboard */; };
@@ -16,7 +17,6 @@
 		D56A130A22BB9D2E0083E2B9 /* SecretNovelsProTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A130922BB9D2E0083E2B9 /* SecretNovelsProTests.m */; };
 		D56A131522BB9D2E0083E2B9 /* SecretNovelsProUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */; };
 		D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */ = {isa = PBXBuildFile; fileRef = D56A132222BB9D3B0083E2B9 /* redImage.png */; };
-		D5FFCAAC231CF41400B965DA /* iOS开发常用.txt in Resources */ = {isa = PBXBuildFile; fileRef = D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */; };
 		D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = D5FFCAB0231D047800B965DA /* TSWebView.m */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D53ABE732583803F006C45E1 /* ReatTxtManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReatTxtManager.h; sourceTree = "<group>"; };
+		D53ABE742583803F006C45E1 /* ReatTxtManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReatTxtManager.m; sourceTree = "<group>"; };
 		D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecretNovelsPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -55,7 +57,6 @@
 		D56A131422BB9D2E0083E2B9 /* SecretNovelsProUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecretNovelsProUITests.m; sourceTree = "<group>"; };
 		D56A131622BB9D2E0083E2B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D56A132222BB9D3B0083E2B9 /* redImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redImage.png; sourceTree = "<group>"; };
-		D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iOS开发常用.txt"; sourceTree = "<group>"; };
 		D5FFCAAF231D047800B965DA /* TSWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSWebView.h; sourceTree = "<group>"; };
 		D5FFCAB0231D047800B965DA /* TSWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSWebView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -85,6 +86,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D53ABE6E25838013006C45E1 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				D53ABE732583803F006C45E1 /* ReatTxtManager.h */,
+				D53ABE742583803F006C45E1 /* ReatTxtManager.m */,
+			);
+			path = Tool;
+			sourceTree = "<group>";
+		};
+		D53ABE6F2583801E006C45E1 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				D5FFCAAF231D047800B965DA /* TSWebView.h */,
+				D5FFCAB0231D047800B965DA /* TSWebView.m */,
+			);
+			path = UIKit;
+			sourceTree = "<group>";
+		};
 		D56A12E422BB9D2C0083E2B9 = {
 			isa = PBXGroup;
 			children = (
@@ -108,14 +127,13 @@
 		D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
 			isa = PBXGroup;
 			children = (
-				D5FFCAAB231CF41400B965DA /* iOS开发常用.txt */,
+				D53ABE6F2583801E006C45E1 /* UIKit */,
+				D53ABE6E25838013006C45E1 /* Tool */,
 				D56A132222BB9D3B0083E2B9 /* redImage.png */,
 				D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */,
 				D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */,
 				D56A12F322BB9D2C0083E2B9 /* ViewController.h */,
 				D56A12F422BB9D2C0083E2B9 /* ViewController.m */,
-				D5FFCAAF231D047800B965DA /* TSWebView.h */,
-				D5FFCAB0231D047800B965DA /* TSWebView.m */,
 				D56A12F622BB9D2C0083E2B9 /* Main.storyboard */,
 				D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */,
 				D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */,
@@ -250,7 +268,6 @@
 				D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */,
 				D56A12FA22BB9D2E0083E2B9 /* Assets.xcassets in Resources */,
 				D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */,
-				D5FFCAAC231CF41400B965DA /* iOS开发常用.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +293,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
+				D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */,
 				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
 				D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */,
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
@@ -452,14 +470,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4B7W4R45RH;
+				DEVELOPMENT_TEAM = UL65FD7525;
 				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.SecretNovelsPro;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.zhb.SecretNovelsPro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import <WebKit/WebKit.h>
 #import "TSWebView.h"
+#import "ReatTxtManager.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate,WKUIDelegate,WKNavigationDelegate>
 
@@ -43,197 +44,25 @@
     
     _searchOffset = 0.0;
     _oriTF1Str = @"";
-    
-    UITextField *tf = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight, 140, 40)];
-    tf.placeholder = @"请输入";
-    tf.returnKeyType = UIReturnKeyDone;
-    tf.borderStyle = UITextBorderStyleRoundedRect;
-    tf.delegate = self;
-    [self.view addSubview:tf];
-    _tf = tf;
-    
-    UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(200, statusBarHeight, 50, 40)];
-    [btn2 addTarget:self action:@selector(refreshClick) forControlEvents:UIControlEventTouchUpInside];
-    [btn2 setTitle:@"更新" forState:UIControlStateNormal];
-    [btn2 setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    btn2.backgroundColor = [UIColor blueColor];
-    [self.view addSubview:btn2];
-    
-    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(260, statusBarHeight, 50, 40)];
-    [btn addTarget:self action:@selector(fetchClick) forControlEvents:UIControlEventTouchUpInside];
-    [btn setTitle:@"获取" forState:UIControlStateNormal];
-    [btn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    btn.backgroundColor = [UIColor blueColor];
-    [self.view addSubview:btn];
-    
-    UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight + 50, 100, 40)];
-    tf1.placeholder = @"被替换";
-    tf1.returnKeyType = UIReturnKeyDone;
-    tf1.borderStyle = UITextBorderStyleRoundedRect;
-    tf1.delegate = self;
-    [self.view addSubview:tf1];
-    _tf1 = tf1;
-    
-    UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(155, statusBarHeight + 50, 60, 40)];
-    [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
-    [searchBtn setTitle:@"搜索" forState:UIControlStateNormal];
-    searchBtn.backgroundColor=UIColor.blueColor;
-    [searchBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    [self.view addSubview:searchBtn];
-    
-    UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(220, statusBarHeight + 50, 100, 40)];
-    tf2.placeholder = @"替换者";
-    tf2.returnKeyType = UIReturnKeyDone;
-    tf2.borderStyle = UITextBorderStyleRoundedRect;
-    tf2.delegate = self;
-    [self.view addSubview:tf2];
-    _tf2 = tf2;
-    
-    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, statusBarHeight + 50, 40, 40)];
-    [webBtn addTarget:self action:@selector(showWebClick) forControlEvents:UIControlEventTouchUpInside];
-    [webBtn setTitle:@"Web" forState:UIControlStateNormal];
-    webBtn.backgroundColor=UIColor.blueColor;
-    [webBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    [self.view addSubview:webBtn];
-    
-    NSArray *arr = [[NSUserDefaults standardUserDefaults] valueForKey:@"names"];
-    if (arr) {
-        _mArr = [NSMutableArray arrayWithArray:arr];
-    }else{
-        _mArr = [@[] mutableCopy];
-    }
-    
-    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 100 + statusBarHeight, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 100 - statusBarHeight - 34)];
-    textView.delegate = self;
-    textView.font = [UIFont systemFontOfSize:12];
-    textView.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    float linePading = textView.textContainer.lineFragmentPadding;
-    textView.textContainerInset = UIEdgeInsetsMake(0, -linePading, 200, -linePading);
-    [self.view addSubview:textView];
-    _textView=textView;
-    
-    _tv = ({
-        UITableView *tv = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0) style:UITableViewStylePlain];
-        tv.delegate = self;
-        tv.dataSource = self;
-        if (@available(iOS 11.0, *)) {
-            tv.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
-        } else {
-            // Fallback on earlier versions
-        }
-        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, tv.frame.size.width, 64)];
-        btn.backgroundColor = [UIColor lightGrayColor];
-        [btn setTitle:@"返回" forState:UIControlStateNormal];
-        [btn addTarget:self action:@selector(btnClick) forControlEvents:UIControlEventTouchUpInside];
-        tv.tableHeaderView = btn;
-        [self.view addSubview:tv];
-        tv.hidden = YES;
-        tv;
-    });
-}
-- (void)showWebClick{
-    if (_wkWeb && _bgBtn) {
-        _bgBtn.hidden = NO;
-        [_wkWeb showWeb];
-    }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileNotification:) name:@"FileNotification" object:nil];
+    [self createUI];
 }
 
-- (void)searchClick{
-    [self.view endEditing:YES];
-    if (_textView.text.length <= _tf1.text.length || _tf1.text.length == 0) {
-        return;
-    }
-    
-    if (_strCount > _textView.text.length) {
-        _strCount = 0;
-    }
-    
-    NSRange range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
-    if (range.location != NSNotFound) {
-        NSString *subStr = [_textView.text substringToIndex:range.location];
-        float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
-        _textView.contentOffset = CGPointMake(0, offsetY - 15);
-        _strCount = range.location + 1;
-    }else{
-        if (_strCount == 0) {
-            
-        }else{
-            _strCount = 0;
-            range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
-            NSString *subStr = [_textView.text substringToIndex:range.location];
-            float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
-            _textView.contentOffset = CGPointMake(0, offsetY - 15);
-            _strCount = range.location + 1;
-        }
-    }
-}
-
-- (void)fetchClick{
-    [self.view endEditing:YES];
-    if (_tf.text.length == 0) {
-        return;
-    }
-    for (NSDictionary *dict in _mArr) {
-        if ([dict[@"key"] isEqualToString:_tf.text]) {
-            _textView.text = dict[@"value"];
-        }
-    }
-}
-- (void)refreshClick{
-    [self.view endEditing:YES];
-    if (_tf.text.length > 0) {
-        if ([_tf.text isEqualToString:@"0912"]) {
-            _tv.hidden = NO;
-            [_tv reloadData];
-        }else{
-            if (![_mArr containsObject:_tf.text]  && _textView.text.length > 0) {
-                [_mArr addObject:@{@"key":_tf.text,@"value":_textView.text,@"offsety":@"0"}];
-                [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
-            }
-        }
-        _tf.text = @"";
-    }
+#pragma mark - 处理外部打开文件
+- (void)fileNotification:(NSNotification *)notifcation {
+    NSDictionary *info = notifcation.userInfo;
+    // fileName是文件名称、filePath是文件存储在本地的路径
+    // jfkdfj123a.pdf
+    NSString *fileName = [info objectForKey:@"fileName"];
+    // /private/var/mobile/Containers/Data/Application/83643509-E90E-40A6-92EA-47A44B40CBBF/Documents/Inbox/jfkdfj123a.pdf
+    NSString *filePath = [info objectForKey:@"filePath"];
+    NSLog(@"fileName=%@  \nfilePath=%@", fileName, filePath);
+    NSString *string = [ReatTxtManager readTxtWithPath:filePath txtName:fileName];
+    _textView.text = string;
 }
 
 
-- (void)btnClick{
-    _tv.hidden = YES;
-}
-
-- (void)textFieldDidEndEditing:(UITextField *)textField{
-    
-    
-    if (textField == _tf1) {
-        
-        if ([_oriTF1Str isEqualToString:textField.text]) {
-            return;
-        }else{
-            _oriTF1Str = textField.text;
-            _strCount = 0;
-        }
-        
-    }else if (textField == _tf2){
-        if (_tf1.text.length > 0 && _tf2.text.length > 0) {
-            
-            _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
-            NSArray *otherChars = @[@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　"];
-            for (int i = 1; i < _tf1.text.length; i++) {
-                for (NSString *oneChar in otherChars) {
-                    NSMutableString *str = [_tf1.text mutableCopy];
-                    [str insertString:oneChar atIndex:i];
-                    _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
-                }
-            }
-        }
-    }
-}
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    
-    [textField endEditing:YES];
-    return YES;
-}
-
+#pragma mark - tableview代理
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _mArr.count;
 }
@@ -364,7 +193,122 @@
     }
 }
 
+#pragma mark - textView代理
 
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
+    if (textView != _textView) {
+        return NO;
+    }
+    return YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField{
+    
+    
+    if (textField == _tf1) {
+        
+        if ([_oriTF1Str isEqualToString:textField.text]) {
+            return;
+        }else{
+            _oriTF1Str = textField.text;
+            _strCount = 0;
+        }
+        
+    }else if (textField == _tf2){
+        if (_tf1.text.length > 0 && _tf2.text.length > 0) {
+            
+            _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
+            NSArray *otherChars = @[@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　",@"\n\n\n　",@"\n\n\n　　",@"\n\n\n　　　",@"\n\n\n　　　　"];
+            for (int i = 1; i < _tf1.text.length; i++) {
+                for (NSString *oneChar in otherChars) {
+                    NSMutableString *str = [_tf1.text mutableCopy];
+                    [str insertString:oneChar atIndex:i];
+                    _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
+                }
+            }
+        }
+    }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    
+    [textField endEditing:YES];
+    return YES;
+}
+
+
+#pragma mark - 事件
+
+- (void)showWebClick{
+    if (_wkWeb && _bgBtn) {
+        _bgBtn.hidden = NO;
+        [_wkWeb showWeb];
+    }
+}
+
+- (void)searchClick{
+    [self.view endEditing:YES];
+    if (_textView.text.length <= _tf1.text.length || _tf1.text.length == 0) {
+        return;
+    }
+    
+    if (_strCount > _textView.text.length) {
+        _strCount = 0;
+    }
+    
+    NSRange range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
+    if (range.location != NSNotFound) {
+        NSString *subStr = [_textView.text substringToIndex:range.location];
+        float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
+        _textView.contentOffset = CGPointMake(0, offsetY - 15);
+        _strCount = range.location + 1;
+    }else{
+        if (_strCount == 0) {
+            
+        }else{
+            _strCount = 0;
+            range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
+            NSString *subStr = [_textView.text substringToIndex:range.location];
+            float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
+            _textView.contentOffset = CGPointMake(0, offsetY - 15);
+            _strCount = range.location + 1;
+        }
+    }
+}
+
+- (void)fetchClick{
+    if (_tf.text.length == 0) {
+        return;
+    }
+    [self.view endEditing:YES];
+    for (NSDictionary *dict in _mArr) {
+        if ([dict[@"key"] isEqualToString:_tf.text]) {
+            _textView.text = dict[@"value"];
+        }
+    }
+}
+- (void)refreshClick{
+    [self.view endEditing:YES];
+    if (_tf.text.length > 0) {
+        if ([_tf.text isEqualToString:@"0912"]) {
+            _tv.hidden = NO;
+            [_tv reloadData];
+        }else{
+            if (![_mArr containsObject:_tf.text]  && _textView.text.length > 0) {
+                [_mArr addObject:@{@"key":_tf.text,@"value":_textView.text,@"offsety":@"0"}];
+                [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
+            }
+        }
+        _tf.text = @"";
+    }
+}
+
+
+- (void)btnClick{
+    _tv.hidden = YES;
+}
+
+//已经打开列表后的事件
 - (void)copyClick:(UIButton *)btn{
     _textView.text = _resultString;
 }
@@ -400,12 +344,6 @@
     
 }
 
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
-    if (textView != _textView) {
-        return NO;
-    }
-    return YES;
-}
 
 #pragma mark - webviewdelegate
 - (nullable WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
@@ -430,7 +368,7 @@
 
     [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if ([result isKindOfClass:[NSString class]]) {
-            self->_resultString = result;
+            self->_resultString = [self filterHTML2:result];
         }
     }];
 }
@@ -449,4 +387,132 @@
     [self.view endEditing:YES];
 }
 
+-(NSString *)filterHTML:(NSString *)html
+{
+    NSScanner * scanner = [NSScanner scannerWithString:html];
+    NSString * text = nil;
+    while([scanner isAtEnd]==NO)
+    {
+        //找到标签的起始位置
+        [scanner scanUpToString:@"<" intoString:nil];
+        //找到标签的结束位置
+        [scanner scanUpToString:@">" intoString:&text];
+        //替换字符
+        html = [html stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@>",text] withString:@""];
+    }
+//    NSString * regEx = @"<([^>]*)>";
+//    html = [html stringByReplacingOccurrencesOfString:regEx withString:@""];
+    return html;
+}
+
+- (NSString *)filterHTML2:(NSString *)html{
+    NSString *content = html;
+    NSRegularExpression *regularExpretion=[NSRegularExpression regularExpressionWithPattern:@"<[^>]*>|\n"  options:0  error:nil];
+    
+    //替换所有html和换行匹配元素为"-"
+    content=[regularExpretion stringByReplacingMatchesInString:content options:NSMatchingReportProgress range:NSMakeRange(0, content.length) withTemplate:@"-"];
+    
+    regularExpretion=[NSRegularExpression regularExpressionWithPattern:@"-{1,}" options:0 error:nil] ;
+    
+    //把多个"-"匹配为一个"-"
+    content=[regularExpretion stringByReplacingMatchesInString:content options:NSMatchingReportProgress range:NSMakeRange(0, content.length) withTemplate:@"-"];
+    
+    //根据"-"分割到数组
+    NSArray *arr=[NSArray array];
+    content=[NSString stringWithString:content];
+    arr =  [content componentsSeparatedByString:@"-"];
+    NSMutableArray *marr=[NSMutableArray arrayWithArray:arr];
+    [marr removeObject:@""];
+    return  [marr componentsJoinedByString:@"\n"];
+}
+
+#pragma mark - 创建UI
+- (void)createUI{
+    UITextField *tf = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight, 140, 40)];
+    tf.placeholder = @"请输入";
+    tf.returnKeyType = UIReturnKeyDone;
+    tf.borderStyle = UITextBorderStyleRoundedRect;
+    tf.delegate = self;
+    [self.view addSubview:tf];
+    _tf = tf;
+    
+    UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(200, statusBarHeight, 50, 40)];
+    [btn2 addTarget:self action:@selector(refreshClick) forControlEvents:UIControlEventTouchUpInside];
+    [btn2 setTitle:@"更新" forState:UIControlStateNormal];
+    [btn2 setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    btn2.backgroundColor = [UIColor blueColor];
+    [self.view addSubview:btn2];
+    
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(260, statusBarHeight, 50, 40)];
+    [btn addTarget:self action:@selector(fetchClick) forControlEvents:UIControlEventTouchUpInside];
+    [btn setTitle:@"获取" forState:UIControlStateNormal];
+    [btn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    btn.backgroundColor = [UIColor blueColor];
+    [self.view addSubview:btn];
+    
+    UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight + 50, 100, 40)];
+    tf1.placeholder = @"被替换";
+    tf1.returnKeyType = UIReturnKeyDone;
+    tf1.borderStyle = UITextBorderStyleRoundedRect;
+    tf1.delegate = self;
+    [self.view addSubview:tf1];
+    _tf1 = tf1;
+    
+    UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(155, statusBarHeight + 50, 60, 40)];
+    [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
+    [searchBtn setTitle:@"搜索" forState:UIControlStateNormal];
+    searchBtn.backgroundColor=UIColor.blueColor;
+    [searchBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    [self.view addSubview:searchBtn];
+    
+    UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(220, statusBarHeight + 50, 100, 40)];
+    tf2.placeholder = @"替换者";
+    tf2.returnKeyType = UIReturnKeyDone;
+    tf2.borderStyle = UITextBorderStyleRoundedRect;
+    tf2.delegate = self;
+    [self.view addSubview:tf2];
+    _tf2 = tf2;
+    
+    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, statusBarHeight + 50, 40, 40)];
+    [webBtn addTarget:self action:@selector(showWebClick) forControlEvents:UIControlEventTouchUpInside];
+    [webBtn setTitle:@"Web" forState:UIControlStateNormal];
+    webBtn.backgroundColor=UIColor.blueColor;
+    [webBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    [self.view addSubview:webBtn];
+    
+    NSArray *arr = [[NSUserDefaults standardUserDefaults] valueForKey:@"names"];
+    if (arr) {
+        _mArr = [NSMutableArray arrayWithArray:arr];
+    }else{
+        _mArr = [@[] mutableCopy];
+    }
+    
+    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 100 + statusBarHeight, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 100 - statusBarHeight - 34)];
+    textView.delegate = self;
+    textView.font = [UIFont systemFontOfSize:12];
+    textView.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    float linePading = textView.textContainer.lineFragmentPadding;
+    textView.textContainerInset = UIEdgeInsetsMake(0, -linePading, 200, -linePading);
+    [self.view addSubview:textView];
+    _textView=textView;
+    
+    _tv = ({
+        UITableView *tv = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 0) style:UITableViewStylePlain];
+        tv.delegate = self;
+        tv.dataSource = self;
+        if (@available(iOS 11.0, *)) {
+            tv.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
+        } else {
+            // Fallback on earlier versions
+        }
+        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, tv.frame.size.width, 64)];
+        btn.backgroundColor = [UIColor lightGrayColor];
+        [btn setTitle:@"返回" forState:UIControlStateNormal];
+        [btn addTarget:self action:@selector(btnClick) forControlEvents:UIControlEventTouchUpInside];
+        tv.tableHeaderView = btn;
+        [self.view addSubview:tv];
+        tv.hidden = YES;
+        tv;
+    });
+}
 @end
