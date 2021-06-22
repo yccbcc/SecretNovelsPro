@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		39AFB6CD262018560023AB49 /* HandleSystemFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 39AFB6CB262018550023AB49 /* HandleSystemFile.m */; };
 		D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D53ABE742583803F006C45E1 /* ReatTxtManager.m */; };
 		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
 		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
@@ -38,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		39AFB6CB262018550023AB49 /* HandleSystemFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HandleSystemFile.m; sourceTree = "<group>"; };
+		39AFB6CC262018560023AB49 /* HandleSystemFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleSystemFile.h; sourceTree = "<group>"; };
 		D53ABE732583803F006C45E1 /* ReatTxtManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReatTxtManager.h; sourceTree = "<group>"; };
 		D53ABE742583803F006C45E1 /* ReatTxtManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReatTxtManager.m; sourceTree = "<group>"; };
 		D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecretNovelsPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +92,8 @@
 		D53ABE6E25838013006C45E1 /* Tool */ = {
 			isa = PBXGroup;
 			children = (
+				39AFB6CC262018560023AB49 /* HandleSystemFile.h */,
+				39AFB6CB262018550023AB49 /* HandleSystemFile.m */,
 				D53ABE732583803F006C45E1 /* ReatTxtManager.h */,
 				D53ABE742583803F006C45E1 /* ReatTxtManager.m */,
 			);
@@ -294,6 +299,7 @@
 			files = (
 				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
 				D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */,
+				39AFB6CD262018560023AB49 /* HandleSystemFile.m in Sources */,
 				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
 				D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */,
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
@@ -469,6 +475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UL65FD7525;
 				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
@@ -487,6 +494,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4B7W4R45RH;
 				INFOPLIST_FILE = SecretNovelsPro/Info.plist;

@@ -10,8 +10,15 @@
 #import <WebKit/WebKit.h>
 #import "TSWebView.h"
 #import "ReatTxtManager.h"
+#import "HandleSystemFile.h"
 
-@interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UITextViewDelegate,WKUIDelegate,WKNavigationDelegate>
+@interface ViewController ()
+<
+UITableViewDelegate,UITableViewDataSource,
+UITextFieldDelegate,
+UITextViewDelegate,
+WKUIDelegate,WKNavigationDelegate
+>
 
 #define statusBarHeight [UIApplication sharedApplication].statusBarFrame.size.height
 
@@ -22,9 +29,9 @@
     UITableView *_tv;
     NSMutableArray *_mArr;
     
-    UITextField *_tf;
-    UITextField *_tf1;
-    UITextField *_tf2;
+    UITextField *_nameTf;
+    UITextField *_leftTf;
+    UITextField *_rightTf;
     
     UITextView *_textView;
     
@@ -34,16 +41,25 @@
     
     float _searchOffset;
     NSInteger _strCount;
-    NSString *_oriTF1Str;
     
     NSString *_resultString;  //加载的网页中的字符串
+    
+    HandleSystemFile *_handleManger;
 }
+
+/*
+ info.plist -> Supports opening documents in place   会导致"共享"到app功能失效.
+ 
+ UIDocument 保存/打开 "文件" 可能会用到这个 key
+ */
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    _handleManger = [[HandleSystemFile alloc] init];
+    _handleManger.controller = self;
+    
     _searchOffset = 0.0;
-    _oriTF1Str = @"";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileNotification:) name:@"FileNotification" object:nil];
     [self createUI];
 }
@@ -58,7 +74,34 @@
     NSString *filePath = [info objectForKey:@"filePath"];
     NSLog(@"fileName=%@  \nfilePath=%@", fileName, filePath);
     NSString *string = [ReatTxtManager readTxtWithPath:filePath txtName:fileName];
+    _nameTf.text = fileName;
     _textView.text = string;
+}
+
+#pragma mark - 保存到"文件"app
+
+- (void)saveToFileClick{
+    if (_nameTf.text.length <= 0 || _textView.text.length <= 0) {
+        return;
+    }
+    NSString *filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0];
+    filePath = [NSString stringWithFormat:@"%@/file_app",filePath];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isExit = [fileManager fileExistsAtPath:filePath];
+    if (!isExit) {
+        [fileManager createDirectoryAtPath:filePath withIntermediateDirectories:true attributes:nil error:nil];
+    }
+    
+    filePath = [filePath stringByAppendingPathComponent:_nameTf.text];
+    if (![filePath hasSuffix:@".txt"]) {
+        filePath = [NSString stringWithFormat:@"%@.txt",filePath];
+    }
+    
+    [_textView.text writeToFile:filePath atomically:true encoding:NSUTF8StringEncoding error:nil];
+    
+    [HandleSystemFile shareInstance].controller = self;
+    [[HandleSystemFile shareInstance] saveToFile:filePath];
 }
 
 
@@ -193,7 +236,6 @@
     }
 }
 
-#pragma mark - textView代理
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
     if (textView != _textView) {
@@ -202,28 +244,20 @@
     return YES;
 }
 
+#pragma mark - textField代理
+
 - (void)textFieldDidEndEditing:(UITextField *)textField{
-    
-    
-    if (textField == _tf1) {
-        
-        if ([_oriTF1Str isEqualToString:textField.text]) {
-            return;
-        }else{
-            _oriTF1Str = textField.text;
-            _strCount = 0;
-        }
-        
-    }else if (textField == _tf2){
-        if (_tf1.text.length > 0 && _tf2.text.length > 0) {
+
+    if (textField == _rightTf){
+        if (_leftTf.text.length > 0 && _rightTf.text.length > 0) {
             
-            _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
-            NSArray *otherChars = @[@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　",@"\n\n\n　",@"\n\n\n　　",@"\n\n\n　　　",@"\n\n\n　　　　"];
-            for (int i = 1; i < _tf1.text.length; i++) {
+            _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_leftTf.text withString:_rightTf.text];
+            NSArray *otherChars = @[@" ",@"  ",@"   ",@"    ",@"     ",@"\n",@"\n\n",@"\n\n\n",@"　",@"　　",@"　　　",@"\n  ",@"\n　",@"\n　　",@"\n　　　",@"\n　　　　",@"\n\n　",@"\n\n　　",@"\n\n　　　",@"\n\n　　　　",@"\n\n\n　",@"\n\n\n　　",@"\n\n\n　　　",@"\n\n\n　　　　"];
+            for (int i = 1; i < _leftTf.text.length; i++) {
                 for (NSString *oneChar in otherChars) {
-                    NSMutableString *str = [_tf1.text mutableCopy];
+                    NSMutableString *str = [_leftTf.text mutableCopy];
                     [str insertString:oneChar atIndex:i];
-                    _textView.text = [_textView.text stringByReplacingOccurrencesOfString:_tf1.text withString:_tf2.text];
+                    _textView.text = [_textView.text stringByReplacingOccurrencesOfString:str withString:_rightTf.text];
                 }
             }
         }
@@ -239,7 +273,8 @@
 
 #pragma mark - 事件
 
-- (void)showWebClick{
+- (void)webClick{
+
     if (_wkWeb && _bgBtn) {
         _bgBtn.hidden = NO;
         [_wkWeb showWeb];
@@ -248,7 +283,7 @@
 
 - (void)searchClick{
     [self.view endEditing:YES];
-    if (_textView.text.length <= _tf1.text.length || _tf1.text.length == 0) {
+    if (_textView.text.length <= _leftTf.text.length || _leftTf.text.length == 0) {
         return;
     }
     
@@ -256,7 +291,7 @@
         _strCount = 0;
     }
     
-    NSRange range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
+    NSRange range = [_textView.text rangeOfString:_leftTf.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
     if (range.location != NSNotFound) {
         NSString *subStr = [_textView.text substringToIndex:range.location];
         float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
@@ -267,7 +302,7 @@
             
         }else{
             _strCount = 0;
-            range = [_textView.text rangeOfString:_tf1.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
+            range = [_textView.text rangeOfString:_leftTf.text options:NSCaseInsensitiveSearch range:NSMakeRange(_strCount,_textView.text.length - _strCount)];
             NSString *subStr = [_textView.text substringToIndex:range.location];
             float offsetY = [self sizeWithStr:subStr font:[UIFont systemFontOfSize:12] maxWidth:375 maxHeight:MAXFLOAT].height;
             _textView.contentOffset = CGPointMake(0, offsetY - 15);
@@ -277,34 +312,34 @@
 }
 
 - (void)fetchClick{
-    if (_tf.text.length == 0) {
+    if (_nameTf.text.length == 0) {
         return;
     }
     [self.view endEditing:YES];
     for (NSDictionary *dict in _mArr) {
-        if ([dict[@"key"] isEqualToString:_tf.text]) {
+        if ([dict[@"key"] isEqualToString:_nameTf.text]) {
             _textView.text = dict[@"value"];
         }
     }
 }
 - (void)refreshClick{
     [self.view endEditing:YES];
-    if (_tf.text.length > 0) {
-        if ([_tf.text isEqualToString:@"0912"]) {
+    if (_nameTf.text.length > 0) {
+        if ([_nameTf.text isEqualToString:@"0912"]) {
             _tv.hidden = NO;
             [_tv reloadData];
         }else{
-            if (![_mArr containsObject:_tf.text]  && _textView.text.length > 0) {
-                [_mArr addObject:@{@"key":_tf.text,@"value":_textView.text,@"offsety":@"0"}];
+            if (![_mArr containsObject:_nameTf.text]  && _textView.text.length > 0) {
+                [_mArr addObject:@{@"key":_nameTf.text,@"value":_textView.text,@"offsety":@"0"}];
                 [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
             }
         }
-        _tf.text = @"";
+        _nameTf.text = @"";
     }
 }
 
 
-- (void)btnClick{
+- (void)backClick{
     _tv.hidden = YES;
 }
 
@@ -434,7 +469,7 @@
     tf.borderStyle = UITextBorderStyleRoundedRect;
     tf.delegate = self;
     [self.view addSubview:tf];
-    _tf = tf;
+    _nameTf = tf;
     
     UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(200, statusBarHeight, 50, 40)];
     [btn2 addTarget:self action:@selector(refreshClick) forControlEvents:UIControlEventTouchUpInside];
@@ -450,13 +485,20 @@
     btn.backgroundColor = [UIColor blueColor];
     [self.view addSubview:btn];
     
+    UIButton *saveToFileBtn = [[UIButton alloc] initWithFrame:CGRectMake(320, statusBarHeight, 50, 40)];
+    [saveToFileBtn addTarget:self action:@selector(saveToFileClick) forControlEvents:UIControlEventTouchUpInside];
+    [saveToFileBtn setTitle:@"toFile" forState:UIControlStateNormal];
+    [saveToFileBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    saveToFileBtn.backgroundColor = [UIColor blueColor];
+    [self.view addSubview:saveToFileBtn];
+    
     UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight + 50, 100, 40)];
-    tf1.placeholder = @"被替换";
+    tf1.placeholder = @"检索";
     tf1.returnKeyType = UIReturnKeyDone;
     tf1.borderStyle = UITextBorderStyleRoundedRect;
     tf1.delegate = self;
     [self.view addSubview:tf1];
-    _tf1 = tf1;
+    _leftTf = tf1;
     
     UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(155, statusBarHeight + 50, 60, 40)];
     [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
@@ -466,15 +508,15 @@
     [self.view addSubview:searchBtn];
     
     UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(220, statusBarHeight + 50, 100, 40)];
-    tf2.placeholder = @"替换者";
+    tf2.placeholder = @"替换";
     tf2.returnKeyType = UIReturnKeyDone;
     tf2.borderStyle = UITextBorderStyleRoundedRect;
     tf2.delegate = self;
     [self.view addSubview:tf2];
-    _tf2 = tf2;
+    _rightTf = tf2;
     
     UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(330, statusBarHeight + 50, 40, 40)];
-    [webBtn addTarget:self action:@selector(showWebClick) forControlEvents:UIControlEventTouchUpInside];
+    [webBtn addTarget:self action:@selector(webClick) forControlEvents:UIControlEventTouchUpInside];
     [webBtn setTitle:@"Web" forState:UIControlStateNormal];
     webBtn.backgroundColor=UIColor.blueColor;
     [webBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
@@ -508,11 +550,14 @@
         UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, tv.frame.size.width, 64)];
         btn.backgroundColor = [UIColor lightGrayColor];
         [btn setTitle:@"返回" forState:UIControlStateNormal];
-        [btn addTarget:self action:@selector(btnClick) forControlEvents:UIControlEventTouchUpInside];
+        [btn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
         tv.tableHeaderView = btn;
         [self.view addSubview:tv];
         tv.hidden = YES;
         tv;
     });
 }
+
+
+
 @end
