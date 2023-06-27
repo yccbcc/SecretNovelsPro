@@ -64,7 +64,7 @@ WKUIDelegate,WKNavigationDelegate
     [self createUI];
 }
 
-#pragma mark - 处理外部打开文件
+#pragma mark - 处理外部打开文件(File.app通过分享"文件"使用,本app打开本项目)
 - (void)fileNotification:(NSNotification *)notifcation {
     NSDictionary *info = notifcation.userInfo;
     // fileName是文件名称、filePath是文件存储在本地的路径

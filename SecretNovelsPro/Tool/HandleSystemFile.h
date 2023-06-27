@@ -6,6 +6,10 @@
 //  Copyright © 2021 zhaohongbin. All rights reserved.
 //
 
+/*
+ 保存txt到file文件
+ */
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
@@ -18,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) UIViewController *controller;
 
 - (void)saveToFile:(NSString *)filePath;
-- (void)readFile;
+- (void)readFile;//(没有用到)
 
 
 @end
