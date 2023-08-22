@@ -17,8 +17,12 @@
 UITableViewDelegate,UITableViewDataSource,
 UITextFieldDelegate,
 UITextViewDelegate,
-WKUIDelegate,WKNavigationDelegate
+WKUIDelegate,WKNavigationDelegate,
+UIScrollViewDelegate
 >
+
+
+@property(retain, nonatomic) UISlider* readerSlider;
 
 #define statusBarHeight [UIApplication sharedApplication].statusBarFrame.size.height
 
@@ -181,6 +185,11 @@ WKUIDelegate,WKNavigationDelegate
         copyBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
         [copyBtn addTarget:self action:@selector(copyClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:copyBtn];
+        
+        
+        [btn addSubview:self.readerSlider];
+        _readerSlider.tag = 203;
+        
     }
     _bgBtn.tag = 1000 + indexPath.row;
 
@@ -193,6 +202,7 @@ WKUIDelegate,WKNavigationDelegate
         btn2.hidden = false;
         UIButton *btn3 = [_bgBtn viewWithTag:202];
         btn3.hidden = false;
+        _readerSlider.hidden = true;
         
         if (_wkWeb) {
             [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
@@ -217,12 +227,15 @@ WKUIDelegate,WKNavigationDelegate
         btn2.hidden = true;
         UIButton *btn3 = [_bgBtn viewWithTag:202];
         btn3.hidden = true;
+        _readerSlider.hidden = false;
 
         if (_readTXTView) {
             _readTXTView.hidden = NO;
              _readTXTView.text = _mArr[indexPath.row][@"value"];
         }else{
             UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50))];
+            textView.delegate = self;
+            textView.font = [UIFont systemFontOfSize:16];
             textView.tag = 123;
             textView.delegate = self;
             [_bgBtn addSubview:textView];
@@ -236,6 +249,17 @@ WKUIDelegate,WKNavigationDelegate
     }
 }
 
+#pragma mark - scrollview代理
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    NSLog(@"%@",NSStringFromCGPoint(scrollView.contentOffset));
+    if(scrollView == _readTXTView){
+        float value = (scrollView.contentOffset.y * 1.0) / (scrollView.contentSize.height - scrollView.frame.size.height);
+        value = MAX(0, MIN(1, value));
+        _readerSlider.value = value;
+    }
+}
+
+#pragma mark - textView代理
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
     if (textView != _textView) {
@@ -557,6 +581,30 @@ WKUIDelegate,WKNavigationDelegate
         tv;
     });
 }
+
+#pragma mark - slider代理
+- (void) pressSlider:(UISlider*) slider {
+    _readTXTView.contentOffset = CGPointMake(0, (_readTXTView.contentSize.height - _readTXTView.frame.size.height) * slider.value);
+}
+
+#pragma mark - 懒加载
+
+- (UISlider *)readerSlider {
+    if (_readerSlider == nil) {
+        //滑动条
+        _readerSlider = [[UISlider alloc] init];
+        //设置位置，宽度可设置，但高度不可设置
+        _readerSlider.frame = CGRectMake(50, statusBarHeight, UIScreen.mainScreen.bounds.size.width - 100, 50);
+        _readerSlider.maximumValue = 1;
+        _readerSlider.minimumValue = 0;
+        _readerSlider.minimumTrackTintColor = [UIColor blueColor];
+        _readerSlider.maximumTrackTintColor = [UIColor greenColor];
+        [_readerSlider addTarget:self action:@selector(pressSlider:) forControlEvents:UIControlEventValueChanged];
+
+    }
+    return _readerSlider;
+}
+
 
 
 
