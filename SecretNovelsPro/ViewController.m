@@ -149,48 +149,7 @@ UIScrollViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    if (_bgBtn) {
-        _bgBtn.hidden = NO;
-    }else{
-        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-        btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
-       
-        [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
-        [[UIApplication sharedApplication].delegate.window addSubview:btn];
-        _bgBtn = btn;
-        
-        UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, statusBarHeight, 80, 50)];
-        backBtn.tag = 200;
-        backBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
-        [backBtn setTitle:@"上一页" forState:UIControlStateNormal];
-        [backBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
-        [backBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-        [backBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
-        [btn addSubview:backBtn];
-        
-        UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, statusBarHeight, 80, 50)];
-        nextBtn.tag = 201;
-        [nextBtn setTitle:@"下一页" forState:UIControlStateNormal];
-        [nextBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
-        [nextBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-        nextBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
-        [nextBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
-        [btn addSubview:nextBtn];
-        
-        UIButton *copyBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 180, statusBarHeight, 80, 50)];
-        copyBtn.tag = 202;
-        [copyBtn setTitle:@"copy" forState:UIControlStateNormal];
-        [copyBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
-        [copyBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-        copyBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
-        [copyBtn addTarget:self action:@selector(copyClick:) forControlEvents:UIControlEventTouchUpInside];
-        [btn addSubview:copyBtn];
-        
-        
-        [btn addSubview:self.readerSlider];
-        _readerSlider.tag = 203;
-        
-    }
+    [self showBgBtn];
     _bgBtn.tag = 1000 + indexPath.row;
 
    NSString *key = _mArr[indexPath.row][@"key"];
@@ -206,9 +165,6 @@ UIScrollViewDelegate
         
         if (_wkWeb) {
             [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
-            //        NSString *path = [[NSBundle mainBundle] pathForResource:@"iOS开发常用.txt" ofType:nil];
-            //        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
-            //        [_wkWeb loadRequest:request];
         }else{
             TSWebView *wkWeb = [[TSWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
             [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
@@ -349,7 +305,7 @@ UIScrollViewDelegate
 - (void)refreshClick{
     [self.view endEditing:YES];
     if (_nameTf.text.length > 0) {
-        if ([_nameTf.text isEqualToString:@"0912"]) {
+        if ([_nameTf.text isEqualToString:@"0"]) {
             _tv.hidden = NO;
             [_tv reloadData];
         }else{
@@ -587,7 +543,50 @@ UIScrollViewDelegate
     _readTXTView.contentOffset = CGPointMake(0, (_readTXTView.contentSize.height - _readTXTView.frame.size.height) * slider.value);
 }
 
-#pragma mark - 懒加载
+#pragma mark - UI
+
+- (void)showBgBtn{
+    if (_bgBtn) {
+        _bgBtn.hidden = NO;
+    }else{
+        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
+        btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
+       
+        [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
+        [[UIApplication sharedApplication].delegate.window addSubview:btn];
+        _bgBtn = btn;
+        
+        UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, statusBarHeight, 80, 50)];
+        backBtn.tag = 200;
+        backBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
+        [backBtn setTitle:@"上一页" forState:UIControlStateNormal];
+        [backBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [backBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+        [backBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:backBtn];
+        
+        UIButton *nextBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 80, statusBarHeight, 80, 50)];
+        nextBtn.tag = 201;
+        [nextBtn setTitle:@"下一页" forState:UIControlStateNormal];
+        [nextBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [nextBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+        nextBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
+        [nextBtn addTarget:self action:@selector(directedClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:nextBtn];
+        
+        UIButton *copyBtn = [[UIButton alloc] initWithFrame:CGRectMake( btn.frame.size.width - 180, statusBarHeight, 80, 50)];
+        copyBtn.tag = 202;
+        [copyBtn setTitle:@"copy" forState:UIControlStateNormal];
+        [copyBtn setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+        [copyBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+        copyBtn.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
+        [copyBtn addTarget:self action:@selector(copyClick:) forControlEvents:UIControlEventTouchUpInside];
+        [btn addSubview:copyBtn];
+        
+        [btn addSubview:self.readerSlider];
+        _readerSlider.tag = 203;
+    }
+}
 
 - (UISlider *)readerSlider {
     if (_readerSlider == nil) {
