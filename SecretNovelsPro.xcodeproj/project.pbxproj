@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		39AFB6CD262018560023AB49 /* HandleSystemFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 39AFB6CB262018550023AB49 /* HandleSystemFile.m */; };
+		4F9EB5AE2A9893B9007E213E /* ReadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5AD2A9893B9007E213E /* ReadViewController.m */; };
+		4F9EB5B12A989450007E213E /* DCFileTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5B02A989450007E213E /* DCFileTool.m */; };
+		4F9EB5B42A98A23D007E213E /* PageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5B32A98A23D007E213E /* PageController.m */; };
 		D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D53ABE742583803F006C45E1 /* ReatTxtManager.m */; };
 		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
 		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
@@ -41,6 +44,12 @@
 /* Begin PBXFileReference section */
 		39AFB6CB262018550023AB49 /* HandleSystemFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HandleSystemFile.m; sourceTree = "<group>"; };
 		39AFB6CC262018560023AB49 /* HandleSystemFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleSystemFile.h; sourceTree = "<group>"; };
+		4F9EB5AC2A9893B9007E213E /* ReadViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReadViewController.h; sourceTree = "<group>"; };
+		4F9EB5AD2A9893B9007E213E /* ReadViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReadViewController.m; sourceTree = "<group>"; };
+		4F9EB5AF2A989450007E213E /* DCFileTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DCFileTool.h; sourceTree = "<group>"; };
+		4F9EB5B02A989450007E213E /* DCFileTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DCFileTool.m; sourceTree = "<group>"; };
+		4F9EB5B22A98A23D007E213E /* PageController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PageController.h; sourceTree = "<group>"; };
+		4F9EB5B32A98A23D007E213E /* PageController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PageController.m; sourceTree = "<group>"; };
 		D53ABE732583803F006C45E1 /* ReatTxtManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReatTxtManager.h; sourceTree = "<group>"; };
 		D53ABE742583803F006C45E1 /* ReatTxtManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReatTxtManager.m; sourceTree = "<group>"; };
 		D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecretNovelsPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +98,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4F9EB5AB2A989396007E213E /* Reader */ = {
+			isa = PBXGroup;
+			children = (
+				4F9EB5AC2A9893B9007E213E /* ReadViewController.h */,
+				4F9EB5AD2A9893B9007E213E /* ReadViewController.m */,
+				4F9EB5B22A98A23D007E213E /* PageController.h */,
+				4F9EB5B32A98A23D007E213E /* PageController.m */,
+				4F9EB5AF2A989450007E213E /* DCFileTool.h */,
+				4F9EB5B02A989450007E213E /* DCFileTool.m */,
+			);
+			path = Reader;
+			sourceTree = "<group>";
+		};
 		D53ABE6E25838013006C45E1 /* Tool */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,6 +154,7 @@
 		D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
 			isa = PBXGroup;
 			children = (
+				4F9EB5AB2A989396007E213E /* Reader */,
 				D53ABE6F2583801E006C45E1 /* UIKit */,
 				D53ABE6E25838013006C45E1 /* Tool */,
 				D56A132222BB9D3B0083E2B9 /* redImage.png */,
@@ -298,11 +321,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
+				4F9EB5AE2A9893B9007E213E /* ReadViewController.m in Sources */,
 				D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */,
 				39AFB6CD262018560023AB49 /* HandleSystemFile.m in Sources */,
+				4F9EB5B12A989450007E213E /* DCFileTool.m in Sources */,
 				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
 				D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */,
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
+				4F9EB5B42A98A23D007E213E /* PageController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -43,7 +43,7 @@
 
 - (void)readFile{
     NSArray *types = @[@"public.content",@"public.text"];
-    UIDocumentPickerViewController *documentPickerVC = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:types inMode:UIDocumentPickerModeOpen];
+    UIDocumentPickerViewController *documentPickerVC = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:types inMode:UIDocumentPickerModeImport];
     // 设置代理
     documentPickerVC.delegate = self;
     // 设置模态弹出方式
@@ -54,7 +54,16 @@
 
 #pragma mark - UIDocumentPickerDelegate
 
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller{
+    NSLog(@"cancel");
+}
+
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    if (controller.documentPickerMode == UIDocumentPickerModeExportToService) {
+
+        //do some stuff
+        return;
+        }
     // 获取授权
     BOOL fileUrlAuthozied = [urls.firstObject startAccessingSecurityScopedResource];
     if (fileUrlAuthozied) {

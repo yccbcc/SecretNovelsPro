@@ -11,6 +11,7 @@
 #import "TSWebView.h"
 #import "ReatTxtManager.h"
 #import "HandleSystemFile.h"
+#import "ReadViewController.h"
 
 @interface ViewController ()
 <
@@ -22,7 +23,9 @@ UIScrollViewDelegate
 >
 
 
-@property(retain, nonatomic) UISlider* readerSlider;
+@property (nonatomic, strong) UIButton *bgBtn;
+@property (nonatomic, strong) TSWebView *wkWeb;
+
 
 #define statusBarHeight [UIApplication sharedApplication].statusBarFrame.size.height
 
@@ -39,10 +42,6 @@ UIScrollViewDelegate
     
     UITextView *_textView;
     
-    UIButton *_bgBtn;
-    TSWebView *_wkWeb;
-    UITextView *_readTXTView;
-    
     float _searchOffset;
     NSInteger _strCount;
     
@@ -53,7 +52,6 @@ UIScrollViewDelegate
 
 /*
  info.plist -> Supports opening documents in place   会导致"共享"到app功能失效.
- 
  UIDocument 保存/打开 "文件" 可能会用到这个 key
  */
 - (void)viewDidLoad {
@@ -62,7 +60,6 @@ UIScrollViewDelegate
     
     _handleManger = [[HandleSystemFile alloc] init];
     _handleManger.controller = self;
-    
     _searchOffset = 0.0;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileNotification:) name:@"FileNotification" object:nil];
     [self createUI];
@@ -149,70 +146,54 @@ UIScrollViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    [self showBgBtn];
-    _bgBtn.tag = 1000 + indexPath.row;
+    
 
    NSString *key = _mArr[indexPath.row][@"key"];
     if ([key hasPrefix:@"http"]) {
-        
-        UIButton *btn1 = [_bgBtn viewWithTag:200];
-        btn1.hidden = false;
-        UIButton *btn2 = [_bgBtn viewWithTag:201];
-        btn2.hidden = false;
-        UIButton *btn3 = [_bgBtn viewWithTag:202];
-        btn3.hidden = false;
-        _readerSlider.hidden = true;
-        
-        if (_wkWeb) {
-            [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
-        }else{
-            TSWebView *wkWeb = [[TSWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
-            [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:_mArr[indexPath.row][@"key"]]]];
-            wkWeb.tag = 123;
-            wkWeb.UIDelegate = self;
-            wkWeb.navigationDelegate = self;
-            _wkWeb = wkWeb;
-            [_bgBtn addSubview:wkWeb];
-        }
-        [_wkWeb showWeb];
+        self.bgBtn.hidden = false;
+        _bgBtn.tag = 1000 + indexPath.row;
+        [self showWebView:_mArr[indexPath.row][@"key"]];
     }else{
-        
-        UIButton *btn1 = [_bgBtn viewWithTag:200];
-        btn1.hidden = true;
-        UIButton *btn2 = [_bgBtn viewWithTag:201];
-        btn2.hidden = true;
-        UIButton *btn3 = [_bgBtn viewWithTag:202];
-        btn3.hidden = true;
-        _readerSlider.hidden = false;
-
-        if (_readTXTView) {
-            _readTXTView.hidden = NO;
-             _readTXTView.text = _mArr[indexPath.row][@"value"];
-        }else{
-            UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50))];
-            textView.delegate = self;
-            textView.font = [UIFont systemFontOfSize:16];
-            textView.tag = 123;
-            textView.delegate = self;
-            [_bgBtn addSubview:textView];
-            textView.text = _mArr[indexPath.row][@"value"];
-            NSString *offsetY = _mArr[indexPath.row][@"offsety"];
-            if (offsetY.integerValue != 0) {
-                textView.contentOffset = CGPointMake(0, offsetY.integerValue);
-            }
-            _readTXTView = textView;
-        }
+        ReadViewController *vc = [[ReadViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:@{}];
+        vc.row = (int)indexPath.row;
+        vc.modalPresentationStyle = UIModalPresentationFullScreen;
+        [self presentViewController:vc animated:true completion:nil];
+//        NSString *str = @"在日本政府和东京电力公司的核污染水排海方案中，多核素处理系统（ALPS）是关键。日方坚称经过ALPS处理的核污染水为“处理水”，并认为“处理水”已达标可排。但实际情况并非如此。";
+//        NSMutableString *mStr = [[NSMutableString alloc] initWithString:str];
+//        for (int i = 1; i < 2000; i++) {
+//            [mStr appendString:@"\n"];
+//            [mStr appendString:str];
+//        }
+//        _readTXTView.text = [mStr copy];
     }
 }
 
-#pragma mark - scrollview代理
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    NSLog(@"%@",NSStringFromCGPoint(scrollView.contentOffset));
-    if(scrollView == _readTXTView){
-        float value = (scrollView.contentOffset.y * 1.0) / (scrollView.contentSize.height - scrollView.frame.size.height);
-        value = MAX(0, MIN(1, value));
-        _readerSlider.value = value;
+#pragma mark - webviewdelegate
+- (nullable WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+    // 支持window.open(),需要打开新界面是,WKWebView的代理```WKUIDelegate```方法
+    // 会拦截到window.open()事件. 只需要我们在在方法内进行处理
+    if (!navigationAction.targetFrame.isMainFrame) {
+        [webView loadRequest:navigationAction.request];
     }
+    return nil;
+}
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    decisionHandler(WKNavigationActionPolicyAllow);
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
+    //获取所有的html
+    NSString *allHtml = @"document.documentElement.innerHTML";
+    //获取网页title
+    NSString *htmlTitle = @"document.title";
+    //获取网页的一个值
+    NSString *htmlNum = @"document.getElementById('title').innerText";
+
+    [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        if ([result isKindOfClass:[NSString class]]) {
+            self->_resultString = [self filterHTML2:result];
+        }
+    }];
 }
 
 #pragma mark - textView代理
@@ -254,11 +235,14 @@ UIScrollViewDelegate
 #pragma mark - 事件
 
 - (void)webClick{
+    
+//    [HandleSystemFile shareInstance].controller = self;
+//    [[HandleSystemFile shareInstance] readFile];
+//    return;
+    
+    
 
-    if (_wkWeb && _bgBtn) {
-        _bgBtn.hidden = NO;
-        [_wkWeb showWeb];
-    }
+    [self showWebView:@""];
 }
 
 - (void)searchClick{
@@ -305,12 +289,12 @@ UIScrollViewDelegate
 - (void)refreshClick{
     [self.view endEditing:YES];
     if (_nameTf.text.length > 0) {
-        if ([_nameTf.text isEqualToString:@"0"]) {
+        if ([_nameTf.text isEqualToString:@"0912"]) {
             _tv.hidden = NO;
             [_tv reloadData];
         }else{
             if (![_mArr containsObject:_nameTf.text]  && _textView.text.length > 0) {
-                [_mArr addObject:@{@"key":_nameTf.text,@"value":_textView.text,@"offsety":@"0"}];
+                [_mArr addObject:@{@"key":_nameTf.text,@"value":_textView.text,@"offsety":@"0",@"readType":@"0"}];
                 [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
             }
         }
@@ -343,50 +327,16 @@ UIScrollViewDelegate
 }
 
 - (void)removeReader{
-    
-    NSString *key = _mArr[_bgBtn.tag - 1000][@"key"];
-    if ([key hasPrefix:@"http"]) {
-        [_wkWeb hideWeb];
-    }else{
-        NSMutableDictionary *dict = [_mArr[_bgBtn.tag - 1000] mutableCopy];
-        dict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)_readTXTView.contentOffset.y];
-        [_mArr removeObjectAtIndex:_bgBtn.tag - 1000];
-        [_mArr insertObject:dict atIndex:_bgBtn.tag - 1000];
-        [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
-        _readTXTView.hidden = YES;
-    }
+    [_wkWeb hideWeb];
     _bgBtn.hidden = YES;
-    
+    //        NSMutableDictionary *dict = [_mArr[_bgBtn.tag - 1000] mutableCopy];
+    //        dict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)_readTXTView.contentOffset.y];
+    //        [_mArr removeObjectAtIndex:_bgBtn.tag - 1000];
+    //        [_mArr insertObject:dict atIndex:_bgBtn.tag - 1000];
+    //        [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
+    //        _readTXTView.hidden = YES;
 }
 
-
-#pragma mark - webviewdelegate
-- (nullable WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
-    // 支持window.open(),需要打开新界面是,WKWebView的代理```WKUIDelegate```方法
-    // 会拦截到window.open()事件. 只需要我们在在方法内进行处理
-    if (!navigationAction.targetFrame.isMainFrame) {
-        [webView loadRequest:navigationAction.request];
-    }
-    return nil;
-}
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    decisionHandler(WKNavigationActionPolicyAllow);
-}
-
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
-    //获取所有的html
-    NSString *allHtml = @"document.documentElement.innerHTML";
-    //获取网页title
-    NSString *htmlTitle = @"document.title";
-    //获取网页的一个值
-    NSString *htmlNum = @"document.getElementById('title').innerText";
-
-    [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        if ([result isKindOfClass:[NSString class]]) {
-            self->_resultString = [self filterHTML2:result];
-        }
-    }];
-}
 
 #pragma mark - tool
 
@@ -441,7 +391,28 @@ UIScrollViewDelegate
     return  [marr componentsJoinedByString:@"\n"];
 }
 
-#pragma mark - 创建UI
+#pragma mark - UI
+
+- (void)showWebView:(NSString *)urlString{
+    if(urlString.length == 0){
+        [_wkWeb showWeb];
+        return;
+    }
+
+    if (_wkWeb) {
+        [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlString]]];
+    }else{
+        TSWebView *wkWeb = [[TSWebView alloc] initWithFrame:CGRectMake(0, statusBarHeight + 50, [UIScreen mainScreen].bounds.size.width, _bgBtn.frame.size.height - (statusBarHeight + 50)) configuration:[[WKWebViewConfiguration alloc] init]];
+        [wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlString]]];
+        wkWeb.tag = 123;
+        wkWeb.UIDelegate = self;
+        wkWeb.navigationDelegate = self;
+        _wkWeb = wkWeb;
+        [_bgBtn addSubview:wkWeb];
+    }
+    [_wkWeb showWeb];
+}
+
 - (void)createUI{
     UITextField *tf = [[UITextField alloc] initWithFrame:CGRectMake(50, statusBarHeight, 140, 40)];
     tf.placeholder = @"请输入";
@@ -538,23 +509,16 @@ UIScrollViewDelegate
     });
 }
 
-#pragma mark - slider代理
-- (void) pressSlider:(UISlider*) slider {
-    _readTXTView.contentOffset = CGPointMake(0, (_readTXTView.contentSize.height - _readTXTView.frame.size.height) * slider.value);
-}
 
 #pragma mark - UI
 
-- (void)showBgBtn{
-    if (_bgBtn) {
-        _bgBtn.hidden = NO;
-    }else{
+- (UIButton *)bgBtn{
+    if(!_bgBtn){
         UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
         btn.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3];
        
         [btn addTarget:self action:@selector(removeReader) forControlEvents:UIControlEventTouchUpInside];
         [[UIApplication sharedApplication].delegate.window addSubview:btn];
-        _bgBtn = btn;
         
         UIButton *backBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, statusBarHeight, 80, 50)];
         backBtn.tag = 200;
@@ -583,26 +547,12 @@ UIScrollViewDelegate
         [copyBtn addTarget:self action:@selector(copyClick:) forControlEvents:UIControlEventTouchUpInside];
         [btn addSubview:copyBtn];
         
-        [btn addSubview:self.readerSlider];
-        _readerSlider.tag = 203;
+        _bgBtn = btn;
     }
+    return _bgBtn;
 }
 
-- (UISlider *)readerSlider {
-    if (_readerSlider == nil) {
-        //滑动条
-        _readerSlider = [[UISlider alloc] init];
-        //设置位置，宽度可设置，但高度不可设置
-        _readerSlider.frame = CGRectMake(50, statusBarHeight, UIScreen.mainScreen.bounds.size.width - 100, 50);
-        _readerSlider.maximumValue = 1;
-        _readerSlider.minimumValue = 0;
-        _readerSlider.minimumTrackTintColor = [UIColor blueColor];
-        _readerSlider.maximumTrackTintColor = [UIColor greenColor];
-        [_readerSlider addTarget:self action:@selector(pressSlider:) forControlEvents:UIControlEventValueChanged];
 
-    }
-    return _readerSlider;
-}
 
 
 
