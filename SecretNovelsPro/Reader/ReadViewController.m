@@ -16,8 +16,7 @@
 @property(retain, nonatomic) UISlider* readerSlider;
 @property (nonatomic, strong) NSMutableArray *udData;
 @property (nonatomic, strong) NSMutableDictionary *oriDict;
-@property (nonatomic, strong) NSArray *dataArr;
-@property (nonatomic, assign) int readType;
+@property (nonatomic, strong) NSArray *pages;
 
 @end
 
@@ -26,61 +25,93 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
     self.view.backgroundColor = [UIColor colorWithRed:1.00f green:0.97f blue:0.85f alpha:1.00f];;
-    
-    //    NSString *str = @"0000\n第1章.*\r\n1111\n第2章.*\r\n2222\n第3章.*\r\n3333";
-    //    NSArray *arr = [DCFileTool getChapterArrWithString:str];
-    //    NSLog(@"%@",arr);
-    
     self.dataSource = self;
-    PageController *page = [[PageController alloc] init];
-    page.content = self.dataArr.firstObject;
-    [self setViewControllers:@[page] direction:UIPageViewControllerNavigationDirectionForward animated:true completion:nil];
+    self.delegate = self;
+    [self handleViewControllers];
     [self configNavigationBar];
+    [self refreshContent:0 controller:self.viewControllers[0]];
 }
 
-- (UITextView *)getTextViewFromSubController:(UIViewController *)controller{
-    for (UIView *subView in controller.view.subviews) {
-        if([subView isKindOfClass:[UITextView class]]){
-            return (UITextView *)subView;
-        }
-    }
-    return nil;
+- (void)handleViewControllers{
+    PageController *page1 = [[PageController alloc] init];
+    PageController *page2 = [[PageController alloc] init];
+    PageController *page3 = [[PageController alloc] init];
+    self.pages = @[page1,page2,page3];
+    [self setViewControllers:@[page1] direction:UIPageViewControllerNavigationDirectionForward animated:true completion:nil];
 }
-
 
 
 #pragma mark - UIPageViewControllerDataSource
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController{
-    PageController *page = [[PageController alloc] init];
-    page.content = _dataArr[0];
-    return page;
+    PageController *curVC = (PageController *)viewController;
+    if(curVC.index <= 0){
+        return nil;
+    }
+    NSUInteger curIndex = [self.pages indexOfObject:viewController];
+    PageController *beforeVC = curIndex > 0 ? _pages[curIndex - 1] : _pages.lastObject;
+    beforeVC.index = curVC.index - 1;
+    NSLog(@"pageIndex:%d  当前控制器:%lu", curVC.index, (unsigned long)curIndex);
+    NSLog(@"这里去设置了beforeVC");
+    [self refreshContent:beforeVC.index controller:beforeVC];
+    return beforeVC;
 }
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController{
-    return nil;
+    NSArray *dataArr = [self curReadType] == 0 ? @[[self curOriginString]] : [self curPageArray];
+    PageController *curVC = (PageController *)viewController;
+    if(curVC.index >= dataArr.count - 1){
+        return nil;
+    }
+    NSUInteger curIndex = [self.pages indexOfObject:viewController];
+    PageController *afterVC = curIndex < _pages.count - 1 ? _pages[curIndex + 1] : _pages.firstObject;
+    afterVC.index = curVC.index + 1;
+    NSLog(@"pageIndex:%d  当前控制器:%lu", curVC.index, (unsigned long)curIndex);
+    NSLog(@"这里去设置了afterVC");
+    [self refreshContent:afterVC.index controller:afterVC];
+    return afterVC;
+}
+
+- (void)refreshContent:(int)pageIndex controller:(PageController *)controller{
+    NSArray *dataArr = [self curReadType] == 0 ? @[[self curOriginString]] : [self curPageArray];
+    PageController *curVC = (PageController *)controller;
+    curVC.content = dataArr[pageIndex];
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed{
+    if(completed){
+        PageController *curVC = (PageController *)pageViewController.viewControllers.firstObject;
+        self.readerSlider.value = MAX(curVC.index * 1.0 / ([self curPageArray].count - 1), 0);
+    }
 }
 
 #pragma mark - scrollview代理
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    if(_readerSlider.isHighlighted){
-//        return;
-//    }
-//    if(self.readType == 1){
-//        if(scrollView == _readTXTView){
-//            float value = (scrollView.contentOffset.y * 1.0) / (scrollView.contentSize.height - scrollView.frame.size.height);
-//            value = MAX(0, MIN(1, value));
-//            _readerSlider.value = value;
-//        }
-//    }
-//
-//}
-//
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if(_readerSlider.isHighlighted){
+        return;
+    }
+    if([self curReadType] == 0){
+        float value = (scrollView.contentOffset.y * 1.0) / (scrollView.contentSize.height - scrollView.frame.size.height);
+        value = MAX(0, MIN(1, value));
+        _readerSlider.value = value;
+    }
+}
+
 //#pragma mark - slider代理
 - (void) pressSlider:(UISlider*) slider {
-    if(self.readType == 0){
+    if([self curReadType] == 0){
         PageController *page = [self viewControllers][0];
         [page.readTXTView setContentOffset:CGPointMake(0, (page.readTXTView.contentSize.height - page.readTXTView.frame.size.height) * slider.value) animated:false];
+    }else if([self curReadType] == 1){
+        PageController *page = [self viewControllers][0];
+        int nIndex = MAX((int)(([self curPageArray].count - 1) * slider.value), 0);
+        if(page.index == nIndex){
+            return;
+        }
+        page.index = nIndex;
+        //调用该api后,再次滑动时,会触发代理去寻找before和after控制器. 不调用会出现页码错乱
+        [self setViewControllers:@[page] direction:UIPageViewControllerNavigationDirectionForward animated:false completion:nil];
+        [self refreshContent:nIndex controller:page];
+        NSLog(@"pageIndex:%d  当前控制器:%lu", nIndex, (unsigned long)[_pages indexOfObject:page]);
     }
 }
 
@@ -112,28 +143,25 @@
     return [self.oriDict[@"offsety"] floatValue];
 }
 
-
-- (NSArray *)dataArr{
-    if(!_dataArr){
-        NSString *value = [self curOriginString];
-        if([self curReadType] == 0){
-            _dataArr = @[value];
-        }else if ([self curReadType] == 1){
-            
-        }else{
-            
-        }
-    }
-    return _dataArr;
+- (NSArray *)curPageArray{
+    return self.oriDict[@"pageArray"] ?: @[];
 }
 
-
 - (void)refreshReadType:(int)type{
+    if(type == 1){
+        if([self curPageArray].count == 0){
+            CGSize contentSize = ((PageController *)self.viewControllers.firstObject).readTXTView.frame.size;
+            NSArray *pageDataArray = [DCFileTool pagingWithContentString:[self curOriginString] contentSize:contentSize textAttribute:@{NSFontAttributeName: [UIFont fontWithName:@"PingFang TC" size:20]}];
+            self.oriDict[@"pageArray"] = pageDataArray;
+        }
+    }
+    //更新数据源
     self.oriDict[@"readType"] = [NSString stringWithFormat:@"%d",type];
     [self.udData removeObjectAtIndex:self.row];
     [self.udData insertObject:self.oriDict atIndex:self.row];
     [[NSUserDefaults standardUserDefaults] setObject:self.udData forKey:@"names"];
-#warning 这里去更新type
+    //更新文本
+    [self refreshContent:0 controller:self.viewControllers.firstObject];
 }
 
 - (void)refreshOffsety{
@@ -170,7 +198,11 @@
     [self dismissViewControllerAnimated:true completion:nil];
 }
 - (void)switchType{
-    
+    if([self curReadType] == 0){
+        [self refreshReadType:1];
+    }else if ([self curReadType] == 1){
+        [self refreshReadType:0];
+    }
 }
 
 - (UISlider *)readerSlider {

@@ -7,7 +7,7 @@
 //
 
 #import "DCFileTool.h"
-
+#import <UIKit/UIKit.h>
 @implementation DCFileTool
 
 #pragma mark - 获取这个字符串text中的所有findText的所在的NSRange
@@ -79,6 +79,34 @@
     return strMarr;
 }
 
+
+
++(NSArray *)pagingWithContentString:(NSString *)contentString contentSize:(CGSize)contentSize textAttribute:(NSDictionary *)textAttribute
+{
+    
+    NSMutableArray *pageArray = [NSMutableArray array];
+    NSMutableAttributedString *orginAttributeString = [[NSMutableAttributedString alloc]initWithString:contentString attributes:textAttribute];
+    NSTextStorage *textStorage = [[NSTextStorage alloc]initWithAttributedString:orginAttributeString];
+    NSLayoutManager *layoutManager = [[NSLayoutManager alloc]init];
+    [textStorage addLayoutManager:layoutManager];
+    int I=0;
+    while (YES) {
+        I++;
+        NSTextContainer *textContainer = [[NSTextContainer alloc]initWithSize:contentSize];
+        [layoutManager addTextContainer:textContainer];
+        NSRange rang = [layoutManager glyphRangeForTextContainer:textContainer];
+        if(rang.length <= 0)
+        {
+            break;
+        }
+        NSString *str = [contentString substringWithRange:rang];
+        //NSMutableAttributedString *attstr = [[NSMutableAttributedString alloc]initWithString:str attributes:textAttribute];
+        [pageArray addObject:str];
+    }
+    return pageArray;
+}
+
+
 @end
 
 
@@ -107,31 +135,6 @@
 
  - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
      _textView.attributedText = _dataArr[1];
- }
-
- -(NSArray *)pagingWithContentString:(NSString *)contentString contentSize:(CGSize)contentSize textAttribute:(NSDictionary *)textAttribute
- {
-     
-     NSMutableArray *pageArray = [NSMutableArray array];
-     NSMutableAttributedString *orginAttributeString = [[NSMutableAttributedString alloc]initWithString:contentString attributes:textAttribute];
-     NSTextStorage *textStorage = [[NSTextStorage alloc]initWithAttributedString:orginAttributeString];
-     NSLayoutManager *layoutManager = [[NSLayoutManager alloc]init];
-     [textStorage addLayoutManager:layoutManager];
-     int I=0;
-     while (YES) {
-         I++;
-         NSTextContainer *textContainer = [[NSTextContainer alloc]initWithSize:contentSize];
-         [layoutManager addTextContainer:textContainer];
-         NSRange rang = [layoutManager glyphRangeForTextContainer:textContainer];
-         if(rang.length <= 0)
-         {
-             break;
-         }
-         NSString *str = [contentString substringWithRange:rang];
-         NSMutableAttributedString *attstr = [[NSMutableAttributedString alloc]initWithString:str attributes:textAttribute];
-         [pageArray addObject:attstr];
-     }
-     return pageArray;
  }
 
 

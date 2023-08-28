@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PageController : UIViewController
 
-@property (nonatomic, strong) NSString *content;
 @property (nonatomic, strong) UITextView *readTXTView;
+@property (nonatomic, strong) NSString *content;
+@property (nonatomic, assign) int index;
 
 @end
 
