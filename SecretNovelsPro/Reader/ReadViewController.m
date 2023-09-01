@@ -33,6 +33,13 @@
     [self refreshContent:0 controller:self.viewControllers[0]];
 }
 
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    NSLog(@"获取sliderValue:%f",[self oriSliderValue]);
+    self.readerSlider.value = [self oriSliderValue];
+    [self pressSlider:self.readerSlider];
+}
+
 - (void)handleViewControllers{
     PageController *page1 = [[PageController alloc] init];
     PageController *page2 = [[PageController alloc] init];
@@ -78,7 +85,7 @@
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed{
-    if(completed){
+    if(completed && [self curReadType] == 1){
         PageController *curVC = (PageController *)pageViewController.viewControllers.firstObject;
         self.readerSlider.value = MAX(curVC.index * 1.0 / ([self curPageArray].count - 1), 0);
     }
@@ -96,7 +103,7 @@
     }
 }
 
-//#pragma mark - slider代理
+#pragma mark - slider代理
 - (void) pressSlider:(UISlider*) slider {
     if([self curReadType] == 0){
         PageController *page = [self viewControllers][0];
@@ -143,6 +150,10 @@
     return [self.oriDict[@"offsety"] floatValue];
 }
 
+- (CGFloat)oriSliderValue{
+    return [self.oriDict[@"sliderValue"] floatValue];
+}
+
 - (NSArray *)curPageArray{
     return self.oriDict[@"pageArray"] ?: @[];
 }
@@ -164,12 +175,12 @@
     [self refreshContent:0 controller:self.viewControllers.firstObject];
 }
 
-- (void)refreshOffsety{
-//    _oriDict[@"offsety"] = [NSString stringWithFormat:@"%d",(int)_readTXTView.contentOffset.y];
-//    [_mArr removeObjectAtIndex:_bgBtn.tag - 1000];
-//    [_mArr insertObject:dict atIndex:_bgBtn.tag - 1000];
-//    [[NSUserDefaults standardUserDefaults] setObject:_mArr forKey:@"names"];
-//    _readTXTView.hidden = YES;
+- (void)refreshReaderSliderValue{
+    self.oriDict[@"sliderValue"] = [NSString stringWithFormat:@"%f",_readerSlider.value];
+    [self.udData removeObjectAtIndex:self.row];
+    [self.udData insertObject:self.oriDict atIndex:self.row];
+    [[NSUserDefaults standardUserDefaults] setObject:self.udData forKey:@"names"];
+    NSLog(@"保存sliderValue:%f",_readerSlider.value);
 }
 
 #pragma mark - UI
@@ -195,6 +206,7 @@
 }
 
 - (void)back{
+    [self refreshReaderSliderValue];
     [self dismissViewControllerAnimated:true completion:nil];
 }
 - (void)switchType{
