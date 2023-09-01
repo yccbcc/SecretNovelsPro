@@ -145,8 +145,6 @@ UIScrollViewDelegate
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
-    
 
    NSString *key = _mArr[indexPath.row][@"key"];
     if ([key hasPrefix:@"http"]) {
@@ -158,13 +156,6 @@ UIScrollViewDelegate
         vc.row = (int)indexPath.row;
         vc.modalPresentationStyle = UIModalPresentationFullScreen;
         [self presentViewController:vc animated:true completion:nil];
-//        NSString *str = @"在日本政府和东京电力公司的核污染水排海方案中，多核素处理系统（ALPS）是关键。日方坚称经过ALPS处理的核污染水为“处理水”，并认为“处理水”已达标可排。但实际情况并非如此。";
-//        NSMutableString *mStr = [[NSMutableString alloc] initWithString:str];
-//        for (int i = 1; i < 2000; i++) {
-//            [mStr appendString:@"\n"];
-//            [mStr appendString:str];
-//        }
-//        _readTXTView.text = [mStr copy];
     }
 }
 
@@ -395,6 +386,8 @@ UIScrollViewDelegate
 
 - (void)showWebView:(NSString *)urlString{
     if(urlString.length == 0){
+        _tv.hidden = false;
+        _bgBtn.hidden = false;
         [_wkWeb showWeb];
         return;
     }
