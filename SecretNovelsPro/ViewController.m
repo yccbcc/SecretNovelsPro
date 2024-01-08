@@ -48,6 +48,8 @@ UIScrollViewDelegate
     NSString *_resultString;  //加载的网页中的字符串
     
     HandleSystemFile *_handleManger;
+    
+    BOOL _isFirstShowSuc;
 }
 
 /*
@@ -386,7 +388,14 @@ UIScrollViewDelegate
 
 - (void)showWebView:(NSString *)urlString{
     if(urlString.length == 0){
-        _tv.hidden = false;
+        if(!_isFirstShowSuc){
+            if(_nameTf.text.length > 0 || _textView.text.length > 0){
+                _tv.hidden = false;
+                _isFirstShowSuc = true;
+            }
+        }else{
+            _tv.hidden = false;
+        }
         _bgBtn.hidden = false;
         [_wkWeb showWeb];
         return;
