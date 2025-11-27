@@ -60,10 +60,9 @@
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     if (controller.documentPickerMode == UIDocumentPickerModeExportToService) {
-
         //do some stuff
         return;
-        }
+    }
     // 获取授权
     BOOL fileUrlAuthozied = [urls.firstObject startAccessingSecurityScopedResource];
     if (fileUrlAuthozied) {
@@ -78,6 +77,7 @@
             NSData *fileData = [NSData dataWithContentsOfURL:newURL options:NSDataReadingMappedIfSafe error:&error];
             if (error) {
                 // 读取出错
+                NSLog(@"读取文件失败: %@", error.localizedDescription);
             } else {
                 // 上传
                 NSLog(@"文件名称 : %@", fileName);
@@ -87,6 +87,7 @@
         [urls.firstObject stopAccessingSecurityScopedResource];
     } else {
         // 授权失败
+        NSLog(@"授权失败");
     }
 }
 

@@ -16,6 +16,7 @@
 @implementation ReatTxtManager
 
 + (NSString *)readTxtWithPath:(NSString *)txtPath txtName:(NSString *)name{
+    NSLog(@"txtPath : %@",txtPath);
 
     //-------------------------------------------------------------------------------------------
     //编码格式
@@ -51,29 +52,27 @@
         @(enc)
     ];
     
-    NSLog(@"filePath : %@",txtPath);
     
-    NSURL *url = [NSURL URLWithString:txtPath];
-    
-    NSLog(@"filePath : %@",url.path);
-    
+    NSURL *url = [NSURL fileURLWithPath:txtPath];  //本地路径使用 fileURLWithPath 而不是 URLWithPath
     BOOL isAccessing = [url startAccessingSecurityScopedResource];
-    
-    NSString *aString;
-    for (int i = 0 ; i < [arrEncodingArr count]; i++) {
-        unsigned long encodingCode = [arrEncodingArr[i] unsignedLongValue];
-        NSError *error = nil;
-        aString = [NSString stringWithContentsOfFile:txtPath encoding:encodingCode  error:&error];
-        if (error != nil) {
-            aString = [NSString stringWithFormat:@"获取txt错误: %@",error];
-            NSLog(@"%@",aString);
-        }else{
-            [self writeToTXTFileWithString:aString fileName:name];
-            return aString;
-        }
-    }
+    NSString *aString = @"";
     if (isAccessing) {
+        for (int i = 0 ; i < [arrEncodingArr count]; i++) {
+            unsigned long encodingCode = [arrEncodingArr[i] unsignedLongValue];
+            NSError *error = nil;
+            aString = [NSString stringWithContentsOfFile:txtPath encoding:encodingCode  error:&error];
+            if (error != nil) {
+                aString = [NSString stringWithFormat:@"获取txt错误: %@",error];
+                NSLog(@"%@",aString);
+            }else{
+                [self writeToTXTFileWithString:aString fileName:name];
+                [url stopAccessingSecurityScopedResource];
+                return aString;
+            }
+        }
         [url stopAccessingSecurityScopedResource];
+    } else {
+        NSLog(@"无法访问安全范围资源");
     }
     return aString;
 }

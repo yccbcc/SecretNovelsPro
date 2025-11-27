@@ -77,6 +77,8 @@ UIScrollViewDelegate
     NSString *filePath = [info objectForKey:@"filePath"];
     NSLog(@"fileName=%@  \nfilePath=%@", fileName, filePath);
     NSString *string = [ReatTxtManager readTxtWithPath:filePath txtName:fileName];
+    NSArray *names = [fileName componentsSeparatedByString:@"."];
+    fileName = (names && names.count > 0) ? names.firstObject : fileName;
     _nameTf.text = fileName;
     _textView.text = string;
 }

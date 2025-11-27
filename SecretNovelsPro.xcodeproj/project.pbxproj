@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -50,6 +50,7 @@
 		4F9EB5B02A989450007E213E /* DCFileTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DCFileTool.m; sourceTree = "<group>"; };
 		4F9EB5B22A98A23D007E213E /* PageController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PageController.h; sourceTree = "<group>"; };
 		4F9EB5B32A98A23D007E213E /* PageController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PageController.m; sourceTree = "<group>"; };
+		4FF4DD342D676E4800760281 /* SecretNovelsPro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SecretNovelsPro.entitlements; sourceTree = "<group>"; };
 		D53ABE732583803F006C45E1 /* ReatTxtManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReatTxtManager.h; sourceTree = "<group>"; };
 		D53ABE742583803F006C45E1 /* ReatTxtManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReatTxtManager.m; sourceTree = "<group>"; };
 		D56A12ED22BB9D2C0083E2B9 /* SecretNovelsPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecretNovelsPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +155,7 @@
 		D56A12EF22BB9D2C0083E2B9 /* SecretNovelsPro */ = {
 			isa = PBXGroup;
 			children = (
+				4FF4DD342D676E4800760281 /* SecretNovelsPro.entitlements */,
 				4F9EB5AB2A989396007E213E /* Reader */,
 				D53ABE6F2583801E006C45E1 /* UIKit */,
 				D53ABE6E25838013006C45E1 /* Tool */,
@@ -251,7 +253,8 @@
 		D56A12E522BB9D2C0083E2B9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = zhaohongbin;
 				TargetAttributes = {
 					D56A12EC22BB9D2C0083E2B9 = {
@@ -410,6 +413,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -421,6 +425,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -470,6 +475,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -481,6 +487,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -501,17 +508,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = SecretNovelsPro/SecretNovelsPro.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UL65FD7525;
+				DEVELOPMENT_TEAM = BGSN5YKGKP;
 				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				INFOPLIST_KEY_CFBundleDisplayName = MojiGai;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.zhb.SecretNovelsPro;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexin.zhb.mojigai2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -520,11 +530,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = SecretNovelsPro/SecretNovelsPro.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4B7W4R45RH;
 				INFOPLIST_FILE = SecretNovelsPro/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				INFOPLIST_KEY_CFBundleDisplayName = MojiGai;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
