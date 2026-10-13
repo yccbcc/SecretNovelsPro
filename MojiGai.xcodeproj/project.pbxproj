@@ -11,6 +11,8 @@
 		4F9EB5AE2A9893B9007E213E /* ReadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5AD2A9893B9007E213E /* ReadViewController.m */; };
 		4F9EB5B12A989450007E213E /* DCFileTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5B02A989450007E213E /* DCFileTool.m */; };
 		4F9EB5B42A98A23D007E213E /* PageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5B32A98A23D007E213E /* PageController.m */; };
+		4FDC45F0307CCDA300AD3894 /* ConvertVideoFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDC45EF307CCDA300AD3894 /* ConvertVideoFormat.m */; };
+		BDF2CB089B6CD997A780DF36 /* Pods_Mojigai.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88C46991F4C95F49A6E4D6DE /* Pods_Mojigai.framework */; };
 		D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D53ABE742583803F006C45E1 /* ReatTxtManager.m */; };
 		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
 		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
@@ -50,7 +52,12 @@
 		4F9EB5B02A989450007E213E /* DCFileTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DCFileTool.m; sourceTree = "<group>"; };
 		4F9EB5B22A98A23D007E213E /* PageController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PageController.h; sourceTree = "<group>"; };
 		4F9EB5B32A98A23D007E213E /* PageController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PageController.m; sourceTree = "<group>"; };
+		4FDC45EE307CCDA300AD3894 /* ConvertVideoFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConvertVideoFormat.h; path = Mojigai/Tool/ConvertVideoFormat.h; sourceTree = SOURCE_ROOT; };
+		4FDC45EF307CCDA300AD3894 /* ConvertVideoFormat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConvertVideoFormat.m; path = Mojigai/Tool/ConvertVideoFormat.m; sourceTree = SOURCE_ROOT; };
 		4FF4DD342D676E4800760281 /* MojiGai.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MojiGai.entitlements; sourceTree = "<group>"; };
+		6BF792DADDAA4F30713DA454 /* Pods-Mojigai.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mojigai.release.xcconfig"; path = "Target Support Files/Pods-Mojigai/Pods-Mojigai.release.xcconfig"; sourceTree = "<group>"; };
+		88C46991F4C95F49A6E4D6DE /* Pods_Mojigai.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Mojigai.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B801881E4DFED14736F81C /* Pods-Mojigai.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mojigai.debug.xcconfig"; path = "Target Support Files/Pods-Mojigai/Pods-Mojigai.debug.xcconfig"; sourceTree = "<group>"; };
 		D53ABE732583803F006C45E1 /* ReatTxtManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReatTxtManager.h; sourceTree = "<group>"; };
 		D53ABE742583803F006C45E1 /* ReatTxtManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReatTxtManager.m; sourceTree = "<group>"; };
 		D56A12ED22BB9D2C0083E2B9 /* Mojigai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mojigai.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDF2CB089B6CD997A780DF36 /* Pods_Mojigai.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +107,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1FE41AC08B2B374C3B60FB42 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				88C46991F4C95F49A6E4D6DE /* Pods_Mojigai.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4F9EB5AB2A989396007E213E /* Reader */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +128,15 @@
 			path = Reader;
 			sourceTree = "<group>";
 		};
+		B5D5E349A1B56C591D0FA94F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A1B801881E4DFED14736F81C /* Pods-Mojigai.debug.xcconfig */,
+				6BF792DADDAA4F30713DA454 /* Pods-Mojigai.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		D53ABE6E25838013006C45E1 /* Tool */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +144,8 @@
 				39AFB6CB262018550023AB49 /* HandleSystemFile.m */,
 				D53ABE732583803F006C45E1 /* ReatTxtManager.h */,
 				D53ABE742583803F006C45E1 /* ReatTxtManager.m */,
+				4FDC45EE307CCDA300AD3894 /* ConvertVideoFormat.h */,
+				4FDC45EF307CCDA300AD3894 /* ConvertVideoFormat.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -139,6 +166,8 @@
 				D56A130822BB9D2E0083E2B9 /* MojiGaiTests */,
 				D56A131322BB9D2E0083E2B9 /* MojiGaiUITests */,
 				D56A12EE22BB9D2C0083E2B9 /* Products */,
+				B5D5E349A1B56C591D0FA94F /* Pods */,
+				1FE41AC08B2B374C3B60FB42 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -198,9 +227,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D56A131922BB9D2E0083E2B9 /* Build configuration list for PBXNativeTarget "Mojigai" */;
 			buildPhases = (
+				7F8E67FCDA3240404FC0F678 /* [CP] Check Pods Manifest.lock */,
 				D56A12E922BB9D2C0083E2B9 /* Sources */,
 				D56A12EA22BB9D2C0083E2B9 /* Frameworks */,
 				D56A12EB22BB9D2C0083E2B9 /* Resources */,
+				45972373AEFBF3F0ACF28A45 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -318,6 +349,52 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		45972373AEFBF3F0ACF28A45 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Mojigai/Pods-Mojigai-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Mojigai/Pods-Mojigai-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Mojigai/Pods-Mojigai-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7F8E67FCDA3240404FC0F678 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Mojigai-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D56A12E922BB9D2C0083E2B9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -331,6 +408,7 @@
 				D56A130022BB9D2E0083E2B9 /* main.m in Sources */,
 				D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */,
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
+				4FDC45F0307CCDA300AD3894 /* ConvertVideoFormat.m in Sources */,
 				4F9EB5B42A98A23D007E213E /* PageController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,7 +503,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -487,7 +565,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -506,6 +584,7 @@
 		};
 		D56A131A22BB9D2E0083E2B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1B801881E4DFED14736F81C /* Pods-Mojigai.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Mojigai/Mojigai.entitlements;
@@ -513,6 +592,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DVP8WVES9A;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Mojigai/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MojiGai;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -530,12 +610,14 @@
 		};
 		D56A131B22BB9D2E0083E2B9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6BF792DADDAA4F30713DA454 /* Pods-Mojigai.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Mojigai/Mojigai.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DVP8WVES9A;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Mojigai/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MojiGai;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

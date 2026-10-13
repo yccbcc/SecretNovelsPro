@@ -8,13 +8,64 @@
 
 #import "TSWebView.h"
 
+static NSString * const TSNetworkObserverHandlerName = @"tsNetworkObserver";
+
+static NSString *TSStringValue(id value) {
+    return [value isKindOfClass:[NSString class]] ? value : @"";
+}
+
+#pragma mark - 弱引用消息代理(userContentController 会强引用 handler,经代理转发避免循环引用)
+
+@interface TSWeakScriptMessageHandler : NSObject <WKScriptMessageHandler>
+
+@property (nonatomic, weak) id<WKScriptMessageHandler> delegate;
+
+@end
+
+@implementation TSWeakScriptMessageHandler
+
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    [self.delegate userContentController:userContentController didReceiveScriptMessage:message];
+}
+
+@end
+
+#pragma mark - 请求记录
+
+@implementation TSNetworkRequestInfo
+
+@end
+
+#pragma mark - TSWebView
+
+@interface TSWebView () <WKScriptMessageHandler>
+
+@property (nonatomic, strong) TSWeakScriptMessageHandler *messageHandlerProxy;
+
+@end
+
 @implementation TSWebView
 
 - (instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration{
+    // 注入脚本与消息代理需在 WKWebView 创建前完成,否则对首次加载的页面不生效
+    TSWeakScriptMessageHandler *proxy = [[TSWeakScriptMessageHandler alloc] init];
+    WKUserContentController *userContentController = configuration.userContentController;
+    [userContentController addScriptMessageHandler:proxy name:TSNetworkObserverHandlerName];
+    [userContentController addUserScript:[[WKUserScript alloc] initWithSource:[TSWebView networkObserverScript]
+                                                               injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                                            forMainFrameOnly:NO]];
+
     if (self = [super initWithFrame:frame configuration:configuration]) {
+        proxy.delegate = self;
+        _messageHandlerProxy = proxy;
         [self createMenu];
     }
     return self;
+}
+
+- (void)dealloc {
+    // 移除消息代理,避免 userContentController 长期持有已释放视图对应的代理
+    [self.configuration.userContentController removeScriptMessageHandlerForName:TSNetworkObserverHandlerName];
 }
 
 //构建UIMenuController
@@ -75,5 +126,124 @@
  原文链接：https://blog.csdn.net/xmy0010/article/details/52945689
  
  */
+
+#pragma mark - WKScriptMessageHandler
+
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    if (![message.name isEqualToString:TSNetworkObserverHandlerName] || ![message.body isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+    NSDictionary *body = (NSDictionary *)message.body;
+
+    TSNetworkRequestInfo *request = [[TSNetworkRequestInfo alloc] init];
+    request.type = TSStringValue(body[@"type"]);
+    request.method = TSStringValue(body[@"method"]);
+    request.url = TSStringValue(body[@"url"]);
+    request.params = [body[@"params"] isKindOfClass:[NSString class]] ? body[@"params"] : nil;
+    request.status = [body[@"status"] integerValue];
+    request.response = [body[@"response"] isKindOfClass:[NSString class]] ? body[@"response"] : nil;
+
+    if (self.onNetworkRequest) {
+        self.onNetworkRequest(request);
+    }
+}
+
+#pragma mark - 注入脚本
+
+// 包装 XMLHttpRequest 与 fetch,把请求的 URL / method / 参数与响应状态、响应内容经 messageHandlers 回传
++ (NSString *)networkObserverScript {
+    return [NSString stringWithFormat:@"\
+(function() {\
+    if (window.__tsNetworkObserverInstalled) { return; }\
+    window.__tsNetworkObserverInstalled = true;\
+    var post = function(payload) {\
+        try { window.webkit.messageHandlers.%@.postMessage(payload); } catch (e) {}\
+    };\
+    var toText = function(body) {\
+        if (body === undefined || body === null) { return null; }\
+        if (typeof body === 'string') { return body; }\
+        try {\
+            if (typeof FormData !== 'undefined' && body instanceof FormData) {\
+                var parts = [];\
+                body.forEach(function(value, key) { parts.push(key + '=' + value); });\
+                return parts.join('&');\
+            }\
+            if (typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams) {\
+                return body.toString();\
+            }\
+        } catch (e) {}\
+        return null;\
+    };\
+    var resolveURL = function(url) {\
+        try { return new URL(url, window.location.href).href; } catch (e) { return String(url); }\
+    };\
+    var clamp = function(text) {\
+        if (typeof text !== 'string') { return null; }\
+        return text.length > 10000 ? text.substring(0, 10000) : text;\
+    };\
+    var readResponseText = function(xhr) {\
+        try {\
+            if (xhr.responseType === 'json') { return clamp(JSON.stringify(xhr.response)); }\
+            if (xhr.responseType === 'text' || xhr.responseType === '') { return clamp(xhr.responseText); }\
+        } catch (e) {}\
+        return null;\
+    };\
+    var requestProto = window.XMLHttpRequest && window.XMLHttpRequest.prototype;\
+    if (requestProto) {\
+        var originalOpen = requestProto.open;\
+        var originalSend = requestProto.send;\
+        requestProto.open = function(method, url) {\
+            this.__tsRequestMethod = method;\
+            this.__tsRequestURL = url;\
+            return originalOpen.apply(this, arguments);\
+        };\
+        requestProto.send = function(body) {\
+            var xhr = this;\
+            var method = xhr.__tsRequestMethod || 'GET';\
+            var url = resolveURL(xhr.__tsRequestURL || '');\
+            var params = toText(body);\
+            if (xhr.__tsLoadendHandler) { xhr.removeEventListener('loadend', xhr.__tsLoadendHandler); }\
+            xhr.__tsLoadendHandler = function() {\
+                post({ type: 'xhr', method: method, url: url, params: params, status: xhr.status, response: readResponseText(xhr) });\
+            };\
+            xhr.addEventListener('loadend', xhr.__tsLoadendHandler);\
+            return originalSend.apply(this, arguments);\
+        };\
+    }\
+    var originalFetch = window.fetch;\
+    if (originalFetch) {\
+        window.fetch = function(input, init) {\
+            var isRequest = typeof Request !== 'undefined' && input instanceof Request;\
+            var rawURL = typeof input === 'string' ? input : ((typeof URL !== 'undefined' && input instanceof URL) ? input.href : (input && input.url));\
+            var method = (init && init.method) || (isRequest && input.method) || 'GET';\
+            var url = resolveURL(rawURL || '');\
+            var params = toText(init && init.body);\
+            return originalFetch.apply(this, arguments).then(function(response) {\
+                var record = { type: 'fetch', method: method, url: url, params: params, status: response.status };\
+                var contentType = '';\
+                try { contentType = response.headers.get('content-type') || ''; } catch (e) {}\
+                if (contentType.indexOf('text/event-stream') === 0) {\
+                    post(record);\
+                    return response;\
+                }\
+                try {\
+                    response.clone().text().then(function(text) {\
+                        record.response = clamp(text);\
+                        post(record);\
+                    }, function() {\
+                        post(record);\
+                    });\
+                } catch (e) {\
+                    post(record);\
+                }\
+                return response;\
+            }, function(error) {\
+                post({ type: 'fetch', method: method, url: url, params: params, status: 0 });\
+                throw error;\
+            });\
+        };\
+    }\
+})();", TSNetworkObserverHandlerName];
+}
 
 @end
