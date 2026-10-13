@@ -13,6 +13,9 @@
 #import "HandleSystemFile.h"
 #import "ReadViewController.h"
 #import "ConvertVideoFormat.h"
+#import "HTMLTextTool.h"
+#import "TextReplaceManager.h"
+#import "TSToast.h"
 
 @interface ViewController ()
 <
@@ -51,8 +54,6 @@ UIScrollViewDelegate
     NSString *_resultString;  //加载的网页中的字符串
     
     HandleSystemFile *_handleManger;
-    
-    BOOL _isFirstShowSuc;
 }
 
 /*
@@ -80,6 +81,10 @@ UIScrollViewDelegate
     NSString *filePath = [info objectForKey:@"filePath"];
     NSLog(@"fileName=%@  \nfilePath=%@", fileName, filePath);
     NSString *string = [ReatTxtManager readTxtWithPath:filePath txtName:fileName];
+    if (!string) { //读取失败返回 nil：提示后不更新界面
+        [TSToast show:@"文件读取失败"];
+        return;
+    }
     NSArray *names = [fileName componentsSeparatedByString:@"."];
     fileName = (names && names.count > 0) ? names.firstObject : fileName;
     _nameTf.text = fileName;
@@ -180,17 +185,22 @@ UIScrollViewDelegate
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
-    //获取所有的html
+    //获取所有的html(下载m3u8等仍用原始HTML)
     NSString *allHtml = @"document.documentElement.innerHTML";
-    //获取网页title
-    NSString *htmlTitle = @"document.title";
-    //获取网页的一个值
-    NSString *htmlNum = @"document.getElementById('title').innerText";
-
     [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if ([result isKindOfClass:[NSString class]]) {
             self.pageHTMLString = result;
-            self->_resultString = [self filterHTML2:result];
+            //拿不到innerText时的兜底:用原始HTML过滤出文本
+            if (self->_resultString.length == 0) {
+                self->_resultString = [HTMLTextTool filterHTML:result];
+            }
+        }
+    }];
+
+    //复制按钮用:取页面可见文本,脚本/样式/隐藏元素会被自动排除
+    [webView evaluateJavaScript:@"document.body.innerText" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        if ([result isKindOfClass:[NSString class]] && [(NSString *)result length] > 0) {
+            self->_resultString = result;
         }
     }];
 }
@@ -213,85 +223,8 @@ UIScrollViewDelegate
         NSString *_rightText = _rightTf.text.length > 0 ? _rightTf.text : [NSString stringWithFormat:@"%@改%@", @"张", @"生"];
         _rightText = [_rightText isEqualToString:@"2"] ? [NSString stringWithFormat:@"%@峰", @"云"] : _rightText;
         if (_leftText.length > 0) {
-            
-            // 按组合字符拆分左右文本
-            NSMutableArray<NSString *> *leftChars = [NSMutableArray array];
-            NSMutableArray<NSString *> *rightChars = [NSMutableArray array];
-            [_leftText enumerateSubstringsInRange:NSMakeRange(0, _leftText.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
-                [leftChars addObject:substring];
-            }];
-            [_rightText enumerateSubstringsInRange:NSMakeRange(0, _rightText.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
-                [rightChars addObject:substring];
-            }];
-            
-            // ===== 替换规则(示例中 .. 表示任意空白: 空格/全角空格/换行/制表符,\s 已包含) =====
-            // 一、两边字数相同时(如左栏"abc"→右栏"xyz"):逐字对应替换,空白原样保留
-            //   1. 空白容错:"abc"→"xyz"   "a..bc"→"x..yz"   "ab..c"→"xy..z"   "a..b..c"→"x..y..z"
-            //   2. 尾字可缺:"a..b"→"x..yz"   "ab"→"xyz"
-            //   3. 后缀级联:整条替换完后,再从第2个字符起继续替换后缀
-            //      "bc"→"yz"   "b..c"→"y..z"   "abcbc"→"xyzyz"
-            //      (4字左栏依次为 bcd→xyz、cd→yz;后缀至少留2个字且字符齐全,单独的"b"不动;2字左栏不级联)
-            // 二、左栏比右栏长时(如左栏"abc"→右栏"yz"):右栏对齐左栏末尾,多出的开头字去掉
-            //   1. 整段替换:"abc"→"yz"("a..b..c"→"yz",空白只容错不保留)
-            //   2. 后缀级联:继续去掉开头字替换,直到后缀与右栏等长(后缀至少留2个字):"bc"→"yz"   "b..c"→"y..z"(等长后缀按逐字对应保留空白)
-            //      (4字左栏为整条"abcd"→"yz",再后缀"bcd"→"yz"、"cd"→"yz";后缀要求字符齐全)
-            // 三、其他情况(左栏比右栏短):无法对应,整段替换(匹配内容连同内部空白整体替换为右栏文本)
-            
-            // alignByChar:两边字数相同,逐字对应(保留空白);leftLonger:左栏更长,右栏对齐左栏末尾
-            BOOL alignByChar = leftChars.count == rightChars.count && leftChars.count > 1;
-            BOOL leftLonger = leftChars.count > rightChars.count;
-            NSString *result = _textView.text;
-            // 替换轮数:第0轮匹配整条,后面每轮去掉开头一个字(后缀至少留2个字,避免单字满篇误替换);
-            // 等长时换到只剩2个字,左长右短时换到后缀与右栏等长,如"abc"→"yz"依次替换"abc"、"bc"
-            NSUInteger lastStart = 0;
-            if (alignByChar) {
-                lastStart = leftChars.count - 2;
-            } else if (leftLonger) {
-                NSUInteger minLen = MAX(rightChars.count, 2);
-                lastStart = leftChars.count > minLen ? leftChars.count - minLen : 0;
-            }
-            for (NSUInteger k = 0; k <= lastStart; k++) {
-                // 本轮匹配左栏从第k个字开始的后缀;先长后短,避免长串被短后缀提前拆坏
-                // oneToOne:本轮是否逐字等长对应(等长时保留空白,不等长整段替换只能丢弃空白)
-                BOOL oneToOne = alignByChar || (leftChars.count - k == rightChars.count);
-                NSMutableString *pattern = [NSMutableString string];
-                for (NSUInteger i = k; i < leftChars.count; i++) {
-                    if (i > k) {
-                        // 字与字之间允许夹杂任意空白;需要保留空白时用捕获组,替换时好按位置回填
-                        [pattern appendString:oneToOne ? @"(\\s*)" : @"\\s*"];
-                    }
-                    // 转义正则特殊字符,保证左栏内容按普通文字匹配
-                    NSString *escapedChar = [NSRegularExpression escapedPatternForString:leftChars[i]];
-                    if (k == 0 && alignByChar && i == leftChars.count - 1) {
-                        // 整条匹配时最后一个字符可有可无,非捕获组包住以免拆开 emoji 等代理对,也不影响 $1..$n 编号
-                        [pattern appendFormat:@"(?:%@)?", escapedChar];
-                    } else {
-                        [pattern appendString:escapedChar];
-                    }
-                }
-                
-                // 替换模板:逐字对应时取右栏同位置字符,否则整段用完整右栏文本
-                // tStart:左栏更长时每轮都替换成完整右栏(从右栏第1个字取起),其余情况从第k个字取起
-                NSUInteger tStart = leftLonger ? 0 : k;
-                NSMutableString *template = [NSMutableString string];
-                for (NSUInteger i = tStart; i < rightChars.count; i++) {
-                    if (i > tStart && oneToOne) {
-                        // $n 对应本次匹配第 n-1 和第 n 个字符之间捕获到的空白
-                        [template appendFormat:@"$%lu", (unsigned long)(i - tStart)];
-                    }
-                    // 替换文本中的 \ 和 $ 需要转义,避免被当成模板占位符
-                    NSString *oneChar = [rightChars[i] stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
-                    oneChar = [oneChar stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
-                    [template appendString:oneChar];
-                }
-                
-                // 执行本轮替换,结果作为下一轮的输入继续替换
-                NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
-                if (regex) {
-                    result = [regex stringByReplacingMatchesInString:result options:0 range:NSMakeRange(0, result.length) withTemplate:template];
-                }
-            }
-            _textView.text = result;
+            // 替换规则见 TextReplaceManager
+            _textView.text = [TextReplaceManager replaceText:_textView.text leftText:_leftText rightText:_rightText];
         }
     }
 }
@@ -343,13 +276,13 @@ UIScrollViewDelegate
 
 - (void)webClick{
     
-//    [HandleSystemFile shareInstance].controller = self;
-//    [[HandleSystemFile shareInstance] readFile];
-//    return;
+    [HandleSystemFile shareInstance].controller = self;
+    [[HandleSystemFile shareInstance] readFile];
+    return;
     
     
 
-    [self showWebView:@""];
+    //[self showWebView:@""];
 }
 
 - (void)searchClick{
@@ -393,7 +326,7 @@ UIScrollViewDelegate
         }
     }
 }
-- (void)refreshClick{
+- (void)saveClick{
     [self.view endEditing:YES];
     if (_nameTf.text.length > 0) {
         if ([_nameTf.text isEqualToString:@"0912"]) {
@@ -433,6 +366,11 @@ UIScrollViewDelegate
     }
 }
 
+- (void)reloadClick{
+    [self.m3u8UrlArray removeAllObjects];
+    [_wkWeb reload];
+}
+
 - (void)removeReader{
     [_wkWeb hideWeb];
     _bgBtn.hidden = YES;
@@ -459,58 +397,13 @@ UIScrollViewDelegate
     [self.view endEditing:YES];
 }
 
--(NSString *)filterHTML:(NSString *)html
-{
-    NSScanner * scanner = [NSScanner scannerWithString:html];
-    NSString * text = nil;
-    while([scanner isAtEnd]==NO)
-    {
-        //找到标签的起始位置
-        [scanner scanUpToString:@"<" intoString:nil];
-        //找到标签的结束位置
-        [scanner scanUpToString:@">" intoString:&text];
-        //替换字符
-        html = [html stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@>",text] withString:@""];
-    }
-//    NSString * regEx = @"<([^>]*)>";
-//    html = [html stringByReplacingOccurrencesOfString:regEx withString:@""];
-    return html;
-}
-
-- (NSString *)filterHTML2:(NSString *)html{
-    NSString *content = html;
-    NSRegularExpression *regularExpretion=[NSRegularExpression regularExpressionWithPattern:@"<[^>]*>|\n"  options:0  error:nil];
-    
-    //替换所有html和换行匹配元素为"-"
-    content=[regularExpretion stringByReplacingMatchesInString:content options:NSMatchingReportProgress range:NSMakeRange(0, content.length) withTemplate:@"-"];
-    
-    regularExpretion=[NSRegularExpression regularExpressionWithPattern:@"-{1,}" options:0 error:nil] ;
-    
-    //把多个"-"匹配为一个"-"
-    content=[regularExpretion stringByReplacingMatchesInString:content options:NSMatchingReportProgress range:NSMakeRange(0, content.length) withTemplate:@"-"];
-    
-    //根据"-"分割到数组
-    NSArray *arr=[NSArray array];
-    content=[NSString stringWithString:content];
-    arr =  [content componentsSeparatedByString:@"-"];
-    NSMutableArray *marr=[NSMutableArray arrayWithArray:arr];
-    [marr removeObject:@""];
-    return  [marr componentsJoinedByString:@"\n"];
-}
-
 #pragma mark - UI
 
 - (void)showWebView:(NSString *)urlString{
     if(urlString.length == 0){
-        if(!_isFirstShowSuc){
-            if(_nameTf.text.length > 0 || _textView.text.length > 0){
-                _tv.hidden = false;
-                _isFirstShowSuc = true;
-            }
-        }else{
-            _tv.hidden = false;
-        }
+        if (!_wkWeb) return;
         _bgBtn.hidden = false;
+        _tv.hidden = false;
         [_wkWeb showWeb];
         return;
     }
@@ -546,6 +439,19 @@ UIScrollViewDelegate
     [_wkWeb showWeb];
 }
 
+// 统一样式的功能按钮(保存/获取/toFile/搜索/Web 共用)
+- (UIButton *)standardButtonWithTitle:(NSString *)title action:(SEL)action frame:(CGRect)frame{
+    UIButton *btn = [[UIButton alloc] initWithFrame:frame];
+    [btn setTitle:title forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [btn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    btn.backgroundColor = [UIColor blueColor];
+    btn.layer.cornerRadius = 8;
+    btn.titleLabel.font = [UIFont systemFontOfSize:15];
+    [btn addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    return btn;
+}
+
 - (void)createUI{
     CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
     CGFloat margin = 16;   // 左右边距(对称)
@@ -563,35 +469,17 @@ UIScrollViewDelegate
     [self.view addSubview:tf];
     _nameTf = tf;
     
-    UIButton *btn2 = [[UIButton alloc] initWithFrame:CGRectMake(margin + 180 + gap, statusBarHeight, firstRowBtnW, 40)];
-    [btn2 addTarget:self action:@selector(refreshClick) forControlEvents:UIControlEventTouchUpInside];
-    [btn2 setTitle:@"更新" forState:UIControlStateNormal];
-    [btn2 setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    btn2.backgroundColor = [UIColor blueColor];
-    btn2.layer.cornerRadius = 8;
-    btn2.titleLabel.font = [UIFont systemFontOfSize:15];
-    [btn2 setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.view addSubview:btn2];
-    
-    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(margin + 180 + gap * 2 + firstRowBtnW, statusBarHeight, firstRowBtnW, 40)];
-    [btn addTarget:self action:@selector(fetchClick) forControlEvents:UIControlEventTouchUpInside];
-    [btn setTitle:@"获取" forState:UIControlStateNormal];
-    [btn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    btn.backgroundColor = [UIColor blueColor];
-    btn.layer.cornerRadius = 8;
-    btn.titleLabel.font = [UIFont systemFontOfSize:15];
-    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.view addSubview:btn];
-    
-    UIButton *saveToFileBtn = [[UIButton alloc] initWithFrame:CGRectMake(margin + 180 + gap * 3 + firstRowBtnW * 2, statusBarHeight, firstRowBtnW, 40)];
-    [saveToFileBtn addTarget:self action:@selector(saveToFileClick) forControlEvents:UIControlEventTouchUpInside];
-    [saveToFileBtn setTitle:@"toFile" forState:UIControlStateNormal];
-    [saveToFileBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
-    saveToFileBtn.backgroundColor = [UIColor blueColor];
-    saveToFileBtn.layer.cornerRadius = 8;
-    saveToFileBtn.titleLabel.font = [UIFont systemFontOfSize:15];
-    [saveToFileBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.view addSubview:saveToFileBtn];
+    // 第一行按钮: 保存、获取、toFile
+    NSArray *firstRowTitles  = @[@"保存", @"获取", @"toFile"];
+    NSArray *firstRowActions = @[NSStringFromSelector(@selector(saveClick)),
+                                 NSStringFromSelector(@selector(fetchClick)),
+                                 NSStringFromSelector(@selector(saveToFileClick))];
+    for (NSInteger i = 0; i < firstRowTitles.count; i++) {
+        SEL action = NSSelectorFromString(firstRowActions[i]);
+        CGRect frame = CGRectMake(margin + 180 + gap + i * (firstRowBtnW + gap), statusBarHeight, firstRowBtnW, 40);
+        UIButton *btn = [self standardButtonWithTitle:firstRowTitles[i] action:action frame:frame];
+        [self.view addSubview:btn];
+    }
     
     UITextField *tf1 = [[UITextField alloc] initWithFrame:CGRectMake(margin, statusBarHeight + 50, 100, 40)];
     tf1.placeholder = @"检索";
@@ -603,14 +491,7 @@ UIScrollViewDelegate
     [self.view addSubview:tf1];
     _leftTf = tf1;
     
-    UIButton *searchBtn = [[UIButton alloc] initWithFrame:CGRectMake(margin + 100 + gap, statusBarHeight + 50, secondRowBtnW, 40)];
-    [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
-    [searchBtn setTitle:@"搜索" forState:UIControlStateNormal];
-    searchBtn.backgroundColor=UIColor.blueColor;
-    searchBtn.layer.cornerRadius = 8;
-    searchBtn.titleLabel.font = [UIFont systemFontOfSize:15];
-    [searchBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [searchBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    UIButton *searchBtn = [self standardButtonWithTitle:@"搜索" action:@selector(searchClick) frame:CGRectMake(margin + 100 + gap, statusBarHeight + 50, secondRowBtnW, 40)];
     [self.view addSubview:searchBtn];
     
     UITextField *tf2 = [[UITextField alloc] initWithFrame:CGRectMake(margin + 100 + gap * 2 + secondRowBtnW, statusBarHeight + 50, 100, 40)];
@@ -623,14 +504,7 @@ UIScrollViewDelegate
     [self.view addSubview:tf2];
     _rightTf = tf2;
     
-    UIButton *webBtn = [[UIButton alloc] initWithFrame:CGRectMake(margin + 200 + gap * 3 + secondRowBtnW, statusBarHeight + 50, secondRowBtnW, 40)];
-    [webBtn addTarget:self action:@selector(webClick) forControlEvents:UIControlEventTouchUpInside];
-    [webBtn setTitle:@"Web" forState:UIControlStateNormal];
-    webBtn.backgroundColor=UIColor.blueColor;
-    webBtn.layer.cornerRadius = 8;
-    webBtn.titleLabel.font = [UIFont systemFontOfSize:15];
-    [webBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [webBtn setBackgroundImage:[UIImage imageNamed:@"redImage.png"] forState:UIControlStateHighlighted];
+    UIButton *webBtn = [self standardButtonWithTitle:@"Web" action:@selector(webClick) frame:CGRectMake(margin + 200 + gap * 3 + secondRowBtnW, statusBarHeight + 50, secondRowBtnW, 40)];
     [self.view addSubview:webBtn];
     
     NSArray *arr = [[NSUserDefaults standardUserDefaults] valueForKey:@"names"];
@@ -670,13 +544,11 @@ UIScrollViewDelegate
     });
 }
 
-
-#pragma mark - UI
-
 - (UIButton *)bgBtn{
     if(!_bgBtn){
         CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
-        CGFloat btnW = (screenW - 4 * 12) / 5.0;
+        CGFloat space = 5;
+        CGFloat btnW = (screenW - 5 * space) / 6.0;
         CGFloat btnH = 50.0;
 
         UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, screenW, [UIScreen mainScreen].bounds.size.height)];
@@ -684,19 +556,20 @@ UIScrollViewDelegate
         // 移除原来的 removeReader 背景点击事件
         [[UIApplication sharedApplication].delegate.window addSubview:btn];
 
-        // 顺序：上一页、copy、下载、关闭、下一页
-        NSArray *titles  = @[@"上一页", @"copy", @"下载", @"关闭", @"下一页"];
-        NSArray *tags    = @[@200, @202, @203, @204, @201];
+        // 顺序：上一页、copy、下载、关闭、下一页、刷新
+        NSArray *titles  = @[@"上一页", @"copy", @"下载", @"关闭", @"下一页", @"刷新"];
+        NSArray *tags    = @[@200, @202, @203, @204, @201, @205];
         NSArray *actions = @[
             NSStringFromSelector(@selector(directedClick:)),
             NSStringFromSelector(@selector(copyClick:)),
             NSStringFromSelector(@selector(downloadClick:)),
             NSStringFromSelector(@selector(removeReader)),
             NSStringFromSelector(@selector(directedClick:)),
+            NSStringFromSelector(@selector(reloadClick)),
         ];
 
         for (NSInteger i = 0; i < titles.count; i++) {
-            UIButton *b = [[UIButton alloc] initWithFrame:CGRectMake(i * (btnW + 12), statusBarHeight, btnW, btnH)];
+            UIButton *b = [[UIButton alloc] initWithFrame:CGRectMake(i * (btnW + space), statusBarHeight, btnW, btnH)];
             b.tag = [tags[i] integerValue];
             [b setTitle:titles[i] forState:UIControlStateNormal];
             [b setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
@@ -724,28 +597,10 @@ UIScrollViewDelegate
         if (!self.m3u8UrlArray) {
             self.m3u8UrlArray = [NSMutableArray array];
         }
-        NSError *regexError = nil;
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"src\\s*=\\s*[\"']([^\"']*\\.m3u8[^\"']*)[\"']"
-                                                                                options:NSRegularExpressionCaseInsensitive
-                                                                                  error:&regexError];
-        if (!regexError) {
-            NSArray<NSTextCheckingResult *> *matches = [regex matchesInString:self.pageHTMLString
-                                                                      options:0
-                                                                        range:NSMakeRange(0, self.pageHTMLString.length)];
-            for (NSTextCheckingResult *match in matches) {
-                if (match.numberOfRanges >= 2) {
-                    NSString *src = [self.pageHTMLString substringWithRange:[match rangeAtIndex:1]];
-                    // HTML 实体还原：&amp; -> & 等
-                    src = [src stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-                    src = [src stringByReplacingOccurrencesOfString:@"&quot;" withString:@"\""];
-                    src = [src stringByReplacingOccurrencesOfString:@"&#39;" withString:@"'"];
-                    src = [src stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
-                    src = [src stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
-                    if (src.length > 0 && ![self.m3u8UrlArray containsObject:src]) {
-                        [self.m3u8UrlArray addObject:src];
-                        NSLog(@"从 HTML 提取 m3u8 src: %@", src);
-                    }
-                }
+        for (NSString *src in [HTMLTextTool extractM3U8URLsFromHTML:self.pageHTMLString]) {
+            if (![self.m3u8UrlArray containsObject:src]) {
+                [self.m3u8UrlArray addObject:src];
+                NSLog(@"从 HTML 提取 m3u8 src: %@", src);
             }
         }
     }
@@ -796,40 +651,32 @@ UIScrollViewDelegate
     return nil;
 }
 
-- (void)showToast:(NSString *)message{
-    if (message.length == 0) return;
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    UILabel *toast = [[UILabel alloc] init];
-    toast.text = message;
-    toast.textColor = [UIColor whiteColor];
-    toast.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.8];
-    toast.textAlignment = NSTextAlignmentCenter;
-    toast.layer.cornerRadius = 8;
-    toast.clipsToBounds = YES;
-    toast.font = [UIFont systemFontOfSize:14];
-    toast.numberOfLines = 0;
-    CGFloat maxW = [UIScreen mainScreen].bounds.size.width - 40;
-    CGSize size = [message boundingRectWithSize:CGSizeMake(maxW, 100)
-                                         options:NSStringDrawingUsesLineFragmentOrigin
-                                      attributes:@{NSFontAttributeName: toast.font}
-                                         context:nil].size;
-    CGFloat w = size.width + 32;
-    CGFloat h = size.height + 16;
-    toast.frame = CGRectMake(([UIScreen mainScreen].bounds.size.width - w)/2,
-                             CGRectGetHeight(window.bounds) - 180,
-                             w, h);
-    [window addSubview:toast];
-    [UIView animateWithDuration:0.3 delay:1.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
-        toast.alpha = 0;
-    } completion:^(BOOL finished) {
-        [toast removeFromSuperview];
-    }];
+#pragma mark - 缓存清理
+
+// 清理 Caches 里历次转换残留的 mp4。
+// 背景:转换产物导出到"文件"App 是拷贝,本 app 中的副本不会自动删除,不清理会随每次下载一直堆积。
+// 扩展提醒:将来若提供预览等视频缓存功能,若视频也存于 Caches 会被这里一并清掉;
+// 届时请把转换产物改放独立子目录(如 Caches/VideoConvert/),将清理范围收窄到该目录。
+- (void)removeOldCachedMP4Files{
+    NSURL *cachesURL = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] firstObject];
+    NSArray<NSURL *> *fileURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:cachesURL
+                                                               includingPropertiesForKeys:nil
+                                                                                  options:0
+                                                                                    error:nil];
+    for (NSURL *fileURL in fileURLs) {
+        if ([fileURL.pathExtension.lowercaseString isEqualToString:@"mp4"]) {
+            [[NSFileManager defaultManager] removeItemAtURL:fileURL error:nil];
+        }
+    }
 }
 
 - (void)startConvertWithM3U8URL:(NSString *)m3u8URLString{
     if (m3u8URLString.length == 0) {
         return;
     }
+    // 新任务开始前,先清掉上次转换残留在 Caches 的 mp4(见 removeOldCachedMP4Files)
+    [self removeOldCachedMP4Files];
+
     NSURL *outputURL = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] firstObject];
     NSString *fileName = [NSString stringWithFormat:@"%.0f.mp4", [[NSDate date] timeIntervalSince1970]];
     outputURL = [outputURL URLByAppendingPathComponent:fileName];
@@ -843,34 +690,34 @@ UIScrollViewDelegate
                                             progress:^(float progress) {
         // ffmpeg 回传的是已处理的毫秒数，不是百分比；这里用假进度推到 90% 封顶
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (fakeProgress < 90) {
-                fakeProgress += 3;
-                if (fakeProgress > 90) fakeProgress = 90;
-                [dlBtn setTitle:[NSString stringWithFormat:@"%ld%%", (long)fakeProgress] forState:UIControlStateNormal];
-            }
-        });
-    }
-                                          completion:^(BOOL success, NSURL *url, NSString *error) {
-        // 无论成功失败，都从列表里移除这个 url
-        [self.m3u8UrlArray removeObject:m3u8URLString];
-
-        if (success) {
-            NSLog(@"转换完成: %@", url.path);
-            [dlBtn setTitle:@"100%" forState:UIControlStateNormal];
-            [self showToast:@"下载完成"];
-            // 弹系统 Files 保存面板
-            [HandleSystemFile shareInstance].controller = self;
-            [[HandleSystemFile shareInstance] saveToFile:url.path];
-            // 2 秒后按钮标题恢复成"下载"
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
+                if (fakeProgress < 90) {
+                    fakeProgress += 3;
+                    if (fakeProgress > 90) fakeProgress = 90;
+                    [dlBtn setTitle:[NSString stringWithFormat:@"%ld%%", (long)fakeProgress] forState:UIControlStateNormal];
+                }
             });
-        } else {
-            NSLog(@"转换失败: %@", error);
-            [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
-            [self showToast:[NSString stringWithFormat:@"下载失败: %@", error ?: @"未知错误"]];
+        } completion:^(BOOL success, NSURL *url, NSString *error) {
+            // 无论成功失败，都从列表里移除这个 url
+            [self.m3u8UrlArray removeObject:m3u8URLString];
+
+            if (success) {
+                NSLog(@"转换完成: %@", url.path);
+                [dlBtn setTitle:@"100%" forState:UIControlStateNormal];
+                [TSToast show:@"下载完成"];
+                // 弹系统 Files 保存面板
+                [HandleSystemFile shareInstance].controller = self;
+                [[HandleSystemFile shareInstance] saveToFile:url.path];
+                // 2 秒后按钮标题恢复成"下载"
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
+                });
+            } else {
+                NSLog(@"转换失败: %@", error);
+                [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
+                [TSToast show:[NSString stringWithFormat:@"下载失败: %@", error ?: @"未知错误"]];
+            }
         }
-    }];
+    ];
 }
 
 

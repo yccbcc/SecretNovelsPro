@@ -6,6 +6,11 @@
 //  Copyright © 2026 zhaohongbin. All rights reserved.
 //
 
+/*
+ 把 m3u8 视频（在线链接或本地路径）转换成 mp4 文件
+ 基于 FFmpegKit 异步转换，可查看进度、可取消
+ */
+
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN

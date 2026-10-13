@@ -24,6 +24,9 @@
 		D56A131522BB9D2E0083E2B9 /* MojiGaiUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A131422BB9D2E0083E2B9 /* MojiGaiUITests.m */; };
 		D56A132322BB9D3B0083E2B9 /* redImage.png in Resources */ = {isa = PBXBuildFile; fileRef = D56A132222BB9D3B0083E2B9 /* redImage.png */; };
 		D5FFCAB1231D047800B965DA /* TSWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = D5FFCAB0231D047800B965DA /* TSWebView.m */; };
+		4F9EB5C22A9893B9007E213E /* TextReplaceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C12A9893B9007E213E /* TextReplaceManager.m */; };
+		4F9EB5C52A9893B9007E213E /* HTMLTextTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */; };
+		4F9EB5C82A9893B9007E213E /* TSToast.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C72A9893B9007E213E /* TSToast.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +82,12 @@
 		D56A132222BB9D3B0083E2B9 /* redImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redImage.png; sourceTree = "<group>"; };
 		D5FFCAAF231D047800B965DA /* TSWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSWebView.h; sourceTree = "<group>"; };
 		D5FFCAB0231D047800B965DA /* TSWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSWebView.m; sourceTree = "<group>"; };
+		4F9EB5C02A9893B9007E213E /* TextReplaceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextReplaceManager.h; sourceTree = "<group>"; };
+		4F9EB5C12A9893B9007E213E /* TextReplaceManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TextReplaceManager.m; sourceTree = "<group>"; };
+		4F9EB5C32A9893B9007E213E /* HTMLTextTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTMLTextTool.h; sourceTree = "<group>"; };
+		4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HTMLTextTool.m; sourceTree = "<group>"; };
+		4F9EB5C62A9893B9007E213E /* TSToast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSToast.h; sourceTree = "<group>"; };
+		4F9EB5C72A9893B9007E213E /* TSToast.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSToast.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +155,10 @@
 				D53ABE742583803F006C45E1 /* ReatTxtManager.m */,
 				4FDC45EE307CCDA300AD3894 /* ConvertVideoFormat.h */,
 				4FDC45EF307CCDA300AD3894 /* ConvertVideoFormat.m */,
+				4F9EB5C02A9893B9007E213E /* TextReplaceManager.h */,
+				4F9EB5C12A9893B9007E213E /* TextReplaceManager.m */,
+				4F9EB5C32A9893B9007E213E /* HTMLTextTool.h */,
+				4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -155,6 +168,8 @@
 			children = (
 				D5FFCAAF231D047800B965DA /* TSWebView.h */,
 				D5FFCAB0231D047800B965DA /* TSWebView.m */,
+				4F9EB5C62A9893B9007E213E /* TSToast.h */,
+				4F9EB5C72A9893B9007E213E /* TSToast.m */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -410,6 +425,9 @@
 				D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */,
 				4FDC45F0307CCDA300AD3894 /* ConvertVideoFormat.m in Sources */,
 				4F9EB5B42A98A23D007E213E /* PageController.m in Sources */,
+				4F9EB5C22A9893B9007E213E /* TextReplaceManager.m in Sources */,
+				4F9EB5C52A9893B9007E213E /* HTMLTextTool.m in Sources */,
+				4F9EB5C82A9893B9007E213E /* TSToast.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

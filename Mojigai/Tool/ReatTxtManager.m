@@ -54,60 +54,36 @@
     
     
     NSURL *url = [NSURL fileURLWithPath:txtPath];  //本地路径使用 fileURLWithPath 而不是 URLWithPath
-    BOOL isAccessing = [url startAccessingSecurityScopedResource];
-    NSString *aString = @"";
-    if (isAccessing) {
-        for (int i = 0 ; i < [arrEncodingArr count]; i++) {
-            unsigned long encodingCode = [arrEncodingArr[i] unsignedLongValue];
-            NSError *error = nil;
-            aString = [NSString stringWithContentsOfFile:txtPath encoding:encodingCode  error:&error];
-            if (error != nil) {
-                aString = [NSString stringWithFormat:@"获取txt错误: %@",error];
-                NSLog(@"%@",aString);
-            }else{
-                [self writeToTXTFileWithString:aString fileName:name];
-                [url stopAccessingSecurityScopedResource];
-                return aString;
-            }
+    BOOL didStart = [url startAccessingSecurityScopedResource];  //普通路径下为 no-op；返回 NO 也不代表读不了，不能当门禁
+    NSString *result = nil;
+    for (int i = 0 ; i < [arrEncodingArr count]; i++) {
+        unsigned long encodingCode = [arrEncodingArr[i] unsignedLongValue];
+        NSError *error = nil;
+        result = [NSString stringWithContentsOfFile:txtPath encoding:encodingCode  error:&error];
+        if (result) {
+            [self writeToTXTFileWithString:result fileName:name];
+            break;
         }
-        [url stopAccessingSecurityScopedResource];
-    } else {
-        NSLog(@"无法访问安全范围资源");
+        NSLog(@"读取失败: %@", error);
     }
-    return aString;
+    if (didStart) {
+        [url stopAccessingSecurityScopedResource];  //stop 只与 start 配对，与读取成败无关
+    }
+    return result;  //读取失败返回 nil（空文件返回空串），调用方据此区分
 }
 
 + (void)writeToTXTFileWithString:(NSString *)string fileName:(NSString *)fileName {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        @synchronized (self) {
-
-            //获取文件路径
-            NSString *fullName = [NSString stringWithFormat:@"%@", fileName];
-            NSString *theFilePath = [kFilePath stringByAppendingPathComponent:fullName];
-            NSLog(@"%@",theFilePath);
-            //创建文件管理器
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            //如果文件不存在 创建文件
-            if(![fileManager fileExistsAtPath:theFilePath]){
-                [@"" writeToFile:theFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-            }
-            NSFileHandle *fileHandle = [NSFileHandle fileHandleForUpdatingAtPath:theFilePath];
-            [fileHandle seekToEndOfFile];  //将节点跳到文件的末尾
-            NSData* stringData  = [[NSString stringWithFormat:@"%@\n",string] dataUsingEncoding:NSUTF8StringEncoding];
-            [fileHandle writeData:stringData]; //追加写入数据
-            [fileHandle closeFile];
+        //获取文件路径
+        NSString *theFilePath = [kFilePath stringByAppendingPathComponent:fileName];
+        NSLog(@"%@",theFilePath);
+        //覆盖写入（另存一份）：同一文件重复打开只保留最新一份内容
+        NSError *error = nil;
+        [string writeToFile:theFilePath atomically:YES encoding:NSUTF8StringEncoding error:&error];
+        if (error) {
+            NSLog(@"写入失败: %@", error);
         }
     });
-}
-
-#pragma mark - 获取文件夹下的所有文件
-- (NSArray *)fetchAllFilePaths{
-    NSString *from = kFilePath;
-    NSFileManager *mgr = [NSFileManager defaultManager];
-    NSError *error2;
-    NSArray *subpaths=[mgr contentsOfDirectoryAtPath:from error:&error2];
-    NSLog(@"subpaths = %@",subpaths);
-    return subpaths;
 }
 
 #pragma mark - 读取文件
@@ -143,6 +119,17 @@
             }
         }
     }
+}
+
+
+#pragma mark - 获取文件夹下的所有文件
+- (NSArray *)fetchAllFilePaths{
+    NSString *from = kFilePath;
+    NSFileManager *mgr = [NSFileManager defaultManager];
+    NSError *error2;
+    NSArray *subpaths=[mgr contentsOfDirectoryAtPath:from error:&error2];
+    NSLog(@"subpaths = %@",subpaths);
+    return subpaths;
 }
 
 
