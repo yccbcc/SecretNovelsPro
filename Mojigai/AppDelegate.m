@@ -30,14 +30,15 @@
    if (self.window) {
        if (url) {
            NSString *fileName = url.lastPathComponent; // 从路径中获得完整的文件名（带后缀）
-           // path 类似这种格式：file:///private/var/mobile/Containers/Data/Application/83643509-E90E-40A6-92EA-47A44B40CBBF/Documents/Inbox/jfkdfj123a.pdf
+           // path 是文件在本机的完整地址，类似这种格式：file:///private/var/mobile/Containers/Data/Application/83643509-E90E-40A6-92EA-47A44B40CBBF/Documents/jfkdfj123a.pdf
+           // 旧系统（iOS 26 前）分享进来会先复制到 Documents/Inbox，现已改为直传文件原位置
            NSString *path = url.absoluteString; // 完整的url字符串
            path = [self URLDecodedString:path]; // 解决url编码问题
 
            NSMutableString *string = [[NSMutableString alloc] initWithString:path];
 
            if ([path hasPrefix:@"file://"]) { // 通过前缀来判断是文件
-               // 去除前缀：/private/var/mobile/Containers/Data/Application/83643509-E90E-40A6-92EA-47A44B40CBBF/Documents/Inbox/jfkdfj123a.pdf
+               // 去除前缀得到本地路径：/private/var/mobile/Containers/Data/Application/83643509-E90E-40A6-92EA-47A44B40CBBF/Documents/jfkdfj123a.pdf
                [string replaceOccurrencesOfString:@"file://" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, path.length)];
 
                // 此时获取到文件存储在本地的路径，就可以在自己需要使用的页面使用了
