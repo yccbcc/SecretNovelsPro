@@ -276,13 +276,13 @@ UIScrollViewDelegate
 
 - (void)webClick{
     
-    [HandleSystemFile shareInstance].controller = self;
-    [[HandleSystemFile shareInstance] readFile];
-    return;
+    //[HandleSystemFile shareInstance].controller = self;
+    //[[HandleSystemFile shareInstance] readFile];
+    //return;
     
     
 
-    //[self showWebView:@""];
+    [self showWebView:@""];
 }
 
 - (void)searchClick{
