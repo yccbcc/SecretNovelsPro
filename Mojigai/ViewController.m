@@ -275,18 +275,17 @@ UIScrollViewDelegate
 #pragma mark - 事件
 
 - (void)webClick{
-    
-    //[HandleSystemFile shareInstance].controller = self;
-    //[[HandleSystemFile shareInstance] readFile];
-    //return;
-    
-    
-
     [self showWebView:@""];
 }
 
 - (void)searchClick{
     [self.view endEditing:YES];
+    // 读取文件
+    [HandleSystemFile shareInstance].controller = self;
+    [[HandleSystemFile shareInstance] readFile];
+    return;
+
+    //原搜索功能 暂时屏蔽
     if (_textView.text.length <= _leftTf.text.length || _leftTf.text.length == 0) {
         return;
     }

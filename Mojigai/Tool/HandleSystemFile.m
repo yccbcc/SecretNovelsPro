@@ -63,31 +63,30 @@
         //do some stuff
         return;
     }
-    // 获取授权
-    BOOL fileUrlAuthozied = [urls.firstObject startAccessingSecurityScopedResource];
-    if (fileUrlAuthozied) {
-        // 通过文件协调工具来得到新的文件地址，以此得到文件保护功能
-        NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] init];
-        NSError *error;
-        
-        [fileCoordinator coordinateReadingItemAtURL:urls.firstObject options:0 error:&error byAccessor:^(NSURL *newURL) {
-            // 读取文件
-            NSString *fileName = [newURL lastPathComponent];
-            NSError *error = nil;
-            NSData *fileData = [NSData dataWithContentsOfURL:newURL options:NSDataReadingMappedIfSafe error:&error];
-            if (error) {
-                // 读取出错
-                NSLog(@"读取文件失败: %@", error.localizedDescription);
-            } else {
-                // 上传
-                NSLog(@"文件名称 : %@", fileName);
-                [controller dismissViewControllerAnimated:true completion:nil];
-            }
-        }];
-        [urls.firstObject stopAccessingSecurityScopedResource];
-    } else {
-        // 授权失败
-        NSLog(@"授权失败");
+    // 获取授权：返回 NO 也不代表读不了，不能当门禁（真机对沙盒内文件会返回 NO）
+    BOOL didStart = [urls.firstObject startAccessingSecurityScopedResource];
+    // 通过文件协调工具来得到新的文件地址，以此得到文件保护功能
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] init];
+    NSError *error;
+    
+    [fileCoordinator coordinateReadingItemAtURL:urls.firstObject options:0 error:&error byAccessor:^(NSURL *newURL) {
+        // 读取文件
+        NSString *fileName = [newURL lastPathComponent];
+        NSError *error = nil;
+        NSData *fileData = [NSData dataWithContentsOfURL:newURL options:NSDataReadingMappedIfSafe error:&error];
+        if (error) {
+            // 读取出错
+            NSLog(@"读取文件失败: %@", error.localizedDescription);
+        } else {
+            // 交给 ViewController 的 fileNotification: 读取并展示（复用分享打开路径）
+            NSDictionary *dict = @{@"fileName": fileName,
+                                   @"filePath": newURL.path};
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"FileNotification" object:nil userInfo:dict];
+            [controller dismissViewControllerAnimated:true completion:nil];
+        }
+    }];
+    if (didStart) {
+        [urls.firstObject stopAccessingSecurityScopedResource];  // stop 只与 start 配对，与读取成败无关
     }
 }
 
