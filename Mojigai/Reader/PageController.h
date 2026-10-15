@@ -16,6 +16,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *content;
 @property (nonatomic, assign) int index;
 
+/// 滚动事件转发目标(由阅读器设置,用于滑块跟随滚动)
+@property (nonatomic, weak) id<UIScrollViewDelegate> scrollDelegate;
+
+/// 字号(由阅读器统一设置)
+@property (nonatomic, assign) CGFloat fontSize;
+/// 背景色
+@property (nonatomic, strong) UIColor *readerBgColor;
+/// 文字色
+@property (nonatomic, strong) UIColor *readerTextColor;
+
+/// 应用当前样式(字号/主题变更后调用)
+- (void)applyStyle;
+
 @end
 
 NS_ASSUME_NONNULL_END

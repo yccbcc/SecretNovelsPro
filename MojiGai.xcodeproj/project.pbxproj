@@ -15,7 +15,11 @@
 		BDF2CB089B6CD997A780DF36 /* Pods_Mojigai.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88C46991F4C95F49A6E4D6DE /* Pods_Mojigai.framework */; };
 		D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D53ABE742583803F006C45E1 /* ReatTxtManager.m */; };
 		D56A12F222BB9D2C0083E2B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */; };
-		D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* ViewController.m */; };
+		D56A12F522BB9D2C0083E2B9 /* EditorController.m in Sources */ = {isa = PBXBuildFile; fileRef = D56A12F422BB9D2C0083E2B9 /* EditorController.m */; };
+		MC0000000000000000000C03 /* MainController.m in Sources */ = {isa = PBXBuildFile; fileRef = MC0000000000000000000C02 /* MainController.m */; };
+		SC0000000000000000000D03 /* SourceController.m in Sources */ = {isa = PBXBuildFile; fileRef = SC0000000000000000000D02 /* SourceController.m */; };
+		WC0000000000000000000E03 /* WebController.m in Sources */ = {isa = PBXBuildFile; fileRef = WC0000000000000000000E02 /* WebController.m */; };
+		AC0000000000000000000B03 /* AccessControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000B02 /* AccessControlController.m */; };
 		D56A12F822BB9D2C0083E2B9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D56A12F622BB9D2C0083E2B9 /* Main.storyboard */; };
 		D56A12FA22BB9D2E0083E2B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */; };
 		D56A12FD22BB9D2E0083E2B9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */; };
@@ -27,6 +31,9 @@
 		4F9EB5C22A9893B9007E213E /* TextReplaceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C12A9893B9007E213E /* TextReplaceManager.m */; };
 		4F9EB5C52A9893B9007E213E /* HTMLTextTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */; };
 		4F9EB5C82A9893B9007E213E /* TSToast.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5C72A9893B9007E213E /* TSToast.m */; };
+		4F9EB5D72A9893B9007E213E /* ImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5D12A9893B9007E213E /* ImageStore.m */; };
+		4F9EB5D82A9893B9007E213E /* ImageManagerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5D32A9893B9007E213E /* ImageManagerController.m */; };
+		4F9EB5D92A9893B9007E213E /* ImagePreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EB5D52A9893B9007E213E /* ImagePreviewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,8 +73,16 @@
 		D56A12ED22BB9D2C0083E2B9 /* Mojigai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mojigai.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		D56A12F322BB9D2C0083E2B9 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		D56A12F422BB9D2C0083E2B9 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D56A12F322BB9D2C0083E2B9 /* EditorController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditorController.h; sourceTree = "<group>"; };
+		D56A12F422BB9D2C0083E2B9 /* EditorController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditorController.m; sourceTree = "<group>"; };
+		MC0000000000000000000C01 /* MainController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainController.h; sourceTree = "<group>"; };
+		MC0000000000000000000C02 /* MainController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainController.m; sourceTree = "<group>"; };
+		SC0000000000000000000D01 /* SourceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SourceController.h; sourceTree = "<group>"; };
+		SC0000000000000000000D02 /* SourceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SourceController.m; sourceTree = "<group>"; };
+		WC0000000000000000000E01 /* WebController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebController.h; sourceTree = "<group>"; };
+		WC0000000000000000000E02 /* WebController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebController.m; sourceTree = "<group>"; };
+		AC0000000000000000000B01 /* AccessControlController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AccessControlController.h; sourceTree = "<group>"; };
+		AC0000000000000000000B02 /* AccessControlController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AccessControlController.m; sourceTree = "<group>"; };
 		D56A12F722BB9D2C0083E2B9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D56A12FC22BB9D2E0083E2B9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -88,6 +103,12 @@
 		4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HTMLTextTool.m; sourceTree = "<group>"; };
 		4F9EB5C62A9893B9007E213E /* TSToast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSToast.h; sourceTree = "<group>"; };
 		4F9EB5C72A9893B9007E213E /* TSToast.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TSToast.m; sourceTree = "<group>"; };
+		4F9EB5D02A9893B9007E213E /* ImageStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageStore.h; sourceTree = "<group>"; };
+		4F9EB5D12A9893B9007E213E /* ImageStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageStore.m; sourceTree = "<group>"; };
+		4F9EB5D22A9893B9007E213E /* ImageManagerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageManagerController.h; sourceTree = "<group>"; };
+		4F9EB5D32A9893B9007E213E /* ImageManagerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageManagerController.m; sourceTree = "<group>"; };
+		4F9EB5D42A9893B9007E213E /* ImagePreviewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImagePreviewController.h; sourceTree = "<group>"; };
+		4F9EB5D52A9893B9007E213E /* ImagePreviewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImagePreviewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +180,8 @@
 				4F9EB5C12A9893B9007E213E /* TextReplaceManager.m */,
 				4F9EB5C32A9893B9007E213E /* HTMLTextTool.h */,
 				4F9EB5C42A9893B9007E213E /* HTMLTextTool.m */,
+				4F9EB5D02A9893B9007E213E /* ImageStore.h */,
+				4F9EB5D12A9893B9007E213E /* ImageStore.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -201,13 +224,22 @@
 			children = (
 				4FF4DD342D676E4800760281 /* MojiGai.entitlements */,
 				4F9EB5AB2A989396007E213E /* Reader */,
+				4F9EB5D62A9893B9007E213E /* Image */,
 				D53ABE6F2583801E006C45E1 /* UIKit */,
 				D53ABE6E25838013006C45E1 /* Tool */,
 				D56A132222BB9D3B0083E2B9 /* redImage.png */,
 				D56A12F022BB9D2C0083E2B9 /* AppDelegate.h */,
 				D56A12F122BB9D2C0083E2B9 /* AppDelegate.m */,
-				D56A12F322BB9D2C0083E2B9 /* ViewController.h */,
-				D56A12F422BB9D2C0083E2B9 /* ViewController.m */,
+				D56A12F322BB9D2C0083E2B9 /* EditorController.h */,
+				D56A12F422BB9D2C0083E2B9 /* EditorController.m */,
+				MC0000000000000000000C01 /* MainController.h */,
+				MC0000000000000000000C02 /* MainController.m */,
+				SC0000000000000000000D01 /* SourceController.h */,
+				SC0000000000000000000D02 /* SourceController.m */,
+				WC0000000000000000000E01 /* WebController.h */,
+				WC0000000000000000000E02 /* WebController.m */,
+				AC0000000000000000000B01 /* AccessControlController.h */,
+				AC0000000000000000000B02 /* AccessControlController.m */,
 				D56A12F622BB9D2C0083E2B9 /* Main.storyboard */,
 				D56A12F922BB9D2E0083E2B9 /* Assets.xcassets */,
 				D56A12FB22BB9D2E0083E2B9 /* LaunchScreen.storyboard */,
@@ -233,6 +265,17 @@
 				D56A131622BB9D2E0083E2B9 /* Info.plist */,
 			);
 			path = MojiGaiUITests;
+			sourceTree = "<group>";
+		};
+		4F9EB5D62A9893B9007E213E /* Image */ = {
+			isa = PBXGroup;
+			children = (
+				4F9EB5D22A9893B9007E213E /* ImageManagerController.h */,
+				4F9EB5D32A9893B9007E213E /* ImageManagerController.m */,
+				4F9EB5D42A9893B9007E213E /* ImagePreviewController.h */,
+				4F9EB5D52A9893B9007E213E /* ImagePreviewController.m */,
+			);
+			path = Image;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -415,7 +458,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D56A12F522BB9D2C0083E2B9 /* ViewController.m in Sources */,
+				D56A12F522BB9D2C0083E2B9 /* EditorController.m in Sources */,
+				MC0000000000000000000C03 /* MainController.m in Sources */,
+				SC0000000000000000000D03 /* SourceController.m in Sources */,
+				WC0000000000000000000E03 /* WebController.m in Sources */,
+				AC0000000000000000000B03 /* AccessControlController.m in Sources */,
 				4F9EB5AE2A9893B9007E213E /* ReadViewController.m in Sources */,
 				D53ABE752583803F006C45E1 /* ReatTxtManager.m in Sources */,
 				39AFB6CD262018560023AB49 /* HandleSystemFile.m in Sources */,
@@ -428,6 +475,9 @@
 				4F9EB5C22A9893B9007E213E /* TextReplaceManager.m in Sources */,
 				4F9EB5C52A9893B9007E213E /* HTMLTextTool.m in Sources */,
 				4F9EB5C82A9893B9007E213E /* TSToast.m in Sources */,
+				4F9EB5D72A9893B9007E213E /* ImageStore.m in Sources */,
+				4F9EB5D82A9893B9007E213E /* ImageManagerController.m in Sources */,
+				4F9EB5D92A9893B9007E213E /* ImagePreviewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

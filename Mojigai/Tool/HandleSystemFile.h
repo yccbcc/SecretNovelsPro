@@ -8,7 +8,7 @@
 
 /*
  保存txt到file文件
- 去读取file文件中的文档(现在会崩溃)
+ 去读取file文件中的文档
  */
 
 #import <Foundation/Foundation.h>

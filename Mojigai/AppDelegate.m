@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "AccessControlController.h"
 
 @interface AppDelegate ()
 
@@ -21,6 +22,9 @@
     if (@available(iOS 13.0, *)) {
         self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     }
+    
+    // 每次打开 app 先进入门禁页,通过后再由 AccessControlController 切换根控制器到 MainController 主页
+    self.window.rootViewController = [[AccessControlController alloc] init];
     
     return YES;
 }

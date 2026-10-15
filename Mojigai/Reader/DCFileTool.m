@@ -106,6 +106,87 @@
     return pageArray;
 }
 
+#pragma mark - 文本内容落盘(Documents/txts)
+
++ (NSString *)txtsDirPath{
+    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0];
+    NSString *dir = [doc stringByAppendingPathComponent:@"txts"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dir]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    return dir;
+}
+
+// 文件名只留安全字符,避免路径注入/特殊字符
++ (NSString *)safeBaseName:(NSString *)key{
+    NSCharacterSet *illegal = [NSCharacterSet characterSetWithCharactersInString:@"/\\:*?\"<>|%"];
+    key = [[key componentsSeparatedByCharactersInSet:illegal] componentsJoinedByString:@"_"];
+    if (key.length == 0) key = @"entry";
+    if (key.length > 40) key = [key substringToIndex:40];
+    return key;
+}
+
++ (BOOL)saveValue:(NSString *)value toEntry:(NSMutableDictionary *)entry{
+    NSString *fname = entry[@"file"];
+    if (!fname) {
+        NSString *base = [self safeBaseName:entry[@"key"]];
+        fname = [NSString stringWithFormat:@"%@_%@.txt", base, [NSUUID UUID].UUIDString];
+        entry[@"file"] = fname;
+    }
+    NSString *path = [[self txtsDirPath] stringByAppendingPathComponent:fname];
+    return [value writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
++ (NSString *)readValueForEntry:(NSDictionary *)entry{
+    NSString *fname = entry[@"file"];
+    if (fname) {
+        NSString *path = [[self txtsDirPath] stringByAppendingPathComponent:fname];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+            return [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+        }
+    }
+    // 老格式回退:未落盘时正文仍在 entry 里
+    return entry[@"value"];
+}
+
+#pragma mark - 分页结果缓存
+
++ (NSString *)pagesPathForEntry:(NSDictionary *)entry{
+    NSString *fname = entry[@"file"];
+    if (!fname) return nil;
+    NSString *base = [fname stringByDeletingPathExtension];   // 去掉 .txt
+    return [[self txtsDirPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.pages", base]];
+}
+
++ (BOOL)savePages:(NSArray *)pages forEntry:(NSMutableDictionary *)entry{
+    NSString *path = [self pagesPathForEntry:entry];
+    if (!path) return NO;
+    return [pages writeToFile:path atomically:YES];
+}
+
++ (NSArray *)readPagesForEntry:(NSDictionary *)entry{
+    NSString *path = [self pagesPathForEntry:entry];
+    if (!path) return nil;
+    NSArray *arr = [NSArray arrayWithContentsOfFile:path];
+    return ([arr isKindOfClass:[NSArray class]]) ? arr : nil;
+}
+
++ (void)removePagesForEntry:(NSDictionary *)entry{
+    NSString *path = [self pagesPathForEntry:entry];
+    if (path) {
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    }
+}
+
+#pragma mark - 删除条目相关文件
+
++ (void)removeEntryFiles:(NSDictionary *)entry{
+    NSString *fname = entry[@"file"];
+    if (fname) {
+        [[NSFileManager defaultManager] removeItemAtPath:[[self txtsDirPath] stringByAppendingPathComponent:fname] error:nil];
+    }
+    [self removePagesForEntry:entry];
+}
 
 @end
 
