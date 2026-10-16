@@ -26,6 +26,7 @@
 {
     NSMutableArray *_controlBtns;
     UIView *_controlBar;
+    UIScreenEdgePanGestureRecognizer *_edgeGesture;
 }
 
 - (void)viewDidLoad {
@@ -101,7 +102,9 @@
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
     UIScreenEdgePanGestureRecognizer *edge = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(edgeSwipe:)];
     edge.edges = UIRectEdgeLeft;
+    edge.delegate = self;   // 关键:让 shouldBegin 也门禁自定义手势,无上一页时把触摸让给系统 pop
     [self.view addGestureRecognizer:edge];
+    _edgeGesture = edge;
 
     // 打开逻辑:优先加载传入的 URL;否则加载上次记住的 URL;都没有则空白页
     NSString *savedURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastWebURL"];
@@ -125,18 +128,26 @@
 
 #pragma mark - 右滑手势(网页返回优先)
 
-// 系统右滑 pop 只有在网页没有上一页时才生效;有历史则让位给下面的边缘滑动
+// 系统右滑 pop 只有在网页没有上一页时才生效;自定义边缘滑动只在有上一页时接管
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer == self.navigationController.interactivePopGestureRecognizer) {
         return ![self.wkWeb canGoBack];
     }
+    if (gestureRecognizer == _edgeGesture) {
+        return [self.wkWeb canGoBack];
+    }
     return YES;
 }
 
-// 边缘滑动:有网页上一页则返回网页上一页,否则交给系统 pop
+// 边缘滑动:有网页上一页则返回网页上一页(并记录该页),否则交给系统 pop
 - (void)edgeSwipe:(UIScreenEdgePanGestureRecognizer *)gr {
     if (gr.state == UIGestureRecognizerStateEnded || gr.state == UIGestureRecognizerStateRecognized) {
         if ([self.wkWeb canGoBack]) {
+            // goBack 目标页可能走缓存不触发 didFinishNavigation,提前记录要返回的那一页
+            WKBackForwardListItem *backItem = self.wkWeb.backForwardList.backItem;
+            if (backItem.URL.absoluteString.length > 0) {
+                [[NSUserDefaults standardUserDefaults] setObject:backItem.URL.absoluteString forKey:@"lastWebURL"];
+            }
             [self.wkWeb goBack];
         }
     }
@@ -461,15 +472,21 @@
     [self endRefresh];
 }
 
+// 记录最新打开的网址(含页内跳转、前进后退),供下次进入恢复
+- (void)recordLastURL:(NSString *)urlString {
+    if (urlString.length > 0 && ([urlString hasPrefix:@"http://"] || [urlString hasPrefix:@"https://"])) {
+        [[NSUserDefaults standardUserDefaults] setObject:urlString forKey:@"lastWebURL"];
+    }
+}
+
+- (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
+    // 提交即记录——前进/后退到缓存页也可能不触发 didFinishNavigation,这里兜底
+    [self recordLastURL:webView.URL.absoluteString];
+}
+
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self endRefresh];
-    // 记住最新打开的网址(含页内点击跳转),供下次进入恢复
-    if (navigation) {
-        NSString *current = webView.URL.absoluteString;
-        if (current.length > 0 && ([current hasPrefix:@"http://"] || [current hasPrefix:@"https://"])) {
-            [[NSUserDefaults standardUserDefaults] setObject:current forKey:@"lastWebURL"];
-        }
-    }
+    [self recordLastURL:webView.URL.absoluteString];
     NSString *allHtml = @"document.documentElement.innerHTML";
     [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if ([result isKindOfClass:[NSString class]]) {
