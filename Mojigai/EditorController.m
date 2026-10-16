@@ -132,6 +132,22 @@ UIScrollViewDelegate
     fileName = (names && names.count > 0) ? names.firstObject : fileName;
     _nameTf.text = fileName;
     _textView.text = string;
+
+    // 清理导入产生的临时文件(系统可能放在 Documents/Inbox 或 Documents 根目录),避免留孤儿。
+    // 只清理 Documents 下的非业务文件夹(Inbox/根目录临时文件),绝不碰 txts/images/videos/file_app 等业务数据
+    if ([self shouldCleanImportedStagingAtPath:filePath]) {
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+    }
+}
+
+// 判断导入的临时文件是否可安全清理(在 Documents 下、且不在业务子文件夹内)
+- (BOOL)shouldCleanImportedStagingAtPath:(NSString *)path {
+    if (![path containsString:@"/Documents/"]) return NO;
+    NSArray<NSString *> *protected = @[@"/txts/", @"/images/", @"/videos/", @"/file_app/"];
+    for (NSString *folder in protected) {
+        if ([path containsString:folder]) return NO;
+    }
+    return YES;
 }
 
 #pragma mark - 保存到"文件"app

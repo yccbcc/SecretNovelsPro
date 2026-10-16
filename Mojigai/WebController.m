@@ -15,7 +15,7 @@
 #import "VideoStore.h"
 #import "TSToast.h"
 
-@interface WebController () <WKUIDelegate, WKNavigationDelegate>
+@interface WebController () <WKUIDelegate, WKNavigationDelegate, UIGestureRecognizerDelegate>
 @property (nonatomic, strong) TSWebView *wkWeb;
 @property (nonatomic, strong) NSMutableArray<NSString *> *m3u8UrlArray;
 @property (nonatomic, copy) NSString *pageHTMLString;
@@ -97,6 +97,12 @@
     [refresh addTarget:self action:@selector(reloadClick) forControlEvents:UIControlEventValueChanged];
     wkWeb.scrollView.refreshControl = refresh;
 
+    // 右滑手势:有网页历史时优先返回网页上一页,没有才允许 pop 回主页
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+    UIScreenEdgePanGestureRecognizer *edge = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(edgeSwipe:)];
+    edge.edges = UIRectEdgeLeft;
+    [self.view addGestureRecognizer:edge];
+
     // 打开逻辑:优先加载传入的 URL;否则加载上次记住的 URL;都没有则空白页
     NSString *savedURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastWebURL"];
     if (self.initialURLString.length > 0) {
@@ -115,6 +121,25 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:animated];
+}
+
+#pragma mark - 右滑手势(网页返回优先)
+
+// 系统右滑 pop 只有在网页没有上一页时才生效;有历史则让位给下面的边缘滑动
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer == self.navigationController.interactivePopGestureRecognizer) {
+        return ![self.wkWeb canGoBack];
+    }
+    return YES;
+}
+
+// 边缘滑动:有网页上一页则返回网页上一页,否则交给系统 pop
+- (void)edgeSwipe:(UIScreenEdgePanGestureRecognizer *)gr {
+    if (gr.state == UIGestureRecognizerStateEnded || gr.state == UIGestureRecognizerStateRecognized) {
+        if ([self.wkWeb canGoBack]) {
+            [self.wkWeb goBack];
+        }
+    }
 }
 
 // 操作行放最上方,网页填满下方(含底部安全区)

@@ -165,6 +165,12 @@
         if (!stored) {
             failed++;
             NSLog(@"导入图片失败: %@", error);
+        } else {
+            // 清理导入产生的临时文件(系统可能放在 Documents/Inbox 或 Documents 根目录),避免留孤儿;
+            // 只清理 Documents 下的非业务文件夹,绝不碰 txts/images/videos/file_app 等业务数据
+            if ([self shouldCleanImportedStagingAtPath:url.path]) {
+                [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+            }
         }
     }
     self.imagePaths = [self loadImagePaths];
@@ -179,6 +185,16 @@
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     NSLog(@"取消导入图片");
+}
+
+// 判断导入的临时文件是否可安全清理(在 Documents 下、且不在业务子文件夹内)
+- (BOOL)shouldCleanImportedStagingAtPath:(NSString *)path {
+    if (![path containsString:@"/Documents/"]) return NO;
+    NSArray<NSString *> *protected = @[@"/txts/", @"/images/", @"/videos/", @"/file_app/"];
+    for (NSString *folder in protected) {
+        if ([path containsString:folder]) return NO;
+    }
+    return YES;
 }
 
 @end
