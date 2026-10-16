@@ -15,7 +15,7 @@
 #import "VideoStore.h"
 #import "TSToast.h"
 
-@interface WebController () <WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate>
+@interface WebController () <WKUIDelegate, WKNavigationDelegate>
 @property (nonatomic, strong) TSWebView *wkWeb;
 @property (nonatomic, strong) NSMutableArray<NSString *> *m3u8UrlArray;
 @property (nonatomic, copy) NSString *pageHTMLString;
@@ -24,7 +24,6 @@
 
 @implementation WebController
 {
-    UITextField *_urlField;
     NSMutableArray *_controlBtns;
     UIView *_controlBar;
 }
@@ -34,34 +33,23 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.edgesForExtendedLayout = UIRectEdgeNone;
 
-    // 顶部地址栏:手动输入网址回车打开(具体 frame 在 viewDidLayoutSubviews 统一排布)
-    UITextField *urlField = [[UITextField alloc] initWithFrame:CGRectZero];
-    urlField.borderStyle = UITextBorderStyleRoundedRect;
-    urlField.placeholder = @"输入网址，回车打开";
-    urlField.keyboardType = UIKeyboardTypeURL;
-    urlField.returnKeyType = UIReturnKeyGo;
-    urlField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    urlField.autocorrectionType = UITextAutocorrectionTypeNo;
-    urlField.font = [UIFont systemFontOfSize:14];
-    urlField.delegate = self;
-    [self.view addSubview:urlField];
-    _urlField = urlField;
-
-    // 底部操作行:所有按钮放进一个容器 view,统一背景色
+    // 顶部操作行:所有按钮放进一个容器 view,统一背景色
     _controlBtns = [NSMutableArray array];
     UIView *controlBar = [[UIView alloc] initWithFrame:CGRectZero];
     controlBar.backgroundColor = [UIColor colorWithRed:1.00f green:0.99f blue:0.92f alpha:1.00f];
     [self.view addSubview:controlBar];
     _controlBar = controlBar;
 
-    NSArray *titles  = @[@"上一页", @"copy", @"下载", @"下一页", @"刷新"];
-    NSArray *tags    = @[@200, @202, @203, @201, @205];
+    NSArray *titles  = @[@"上一页", @"URL", @"主页", @"关闭", @"copy", @"下载", @"下一页"];
+    NSArray *tags    = @[@200, @251, @252, @250, @202, @203, @201];
     NSArray *actions = @[
         NSStringFromSelector(@selector(directedClick:)),
+        NSStringFromSelector(@selector(urlClick)),
+        NSStringFromSelector(@selector(homeClick)),
+        NSStringFromSelector(@selector(closeClick)),
         NSStringFromSelector(@selector(copyClick:)),
         NSStringFromSelector(@selector(downloadClick:)),
         NSStringFromSelector(@selector(directedClick:)),
-        NSStringFromSelector(@selector(reloadClick)),
     ];
     for (NSInteger i = 0; i < titles.count; i++) {
         UIButton *b = [[UIButton alloc] initWithFrame:CGRectZero];
@@ -82,7 +70,7 @@
         [_controlBtns addObject:b];
     }
 
-    // 网页视图:位于地址栏之下、控制条之上
+    // 网页视图:位于顶部操作行之下
     __weak typeof(self) weakSelf = self;
     TSWebView *wkWeb = [[TSWebView alloc] initWithFrame:CGRectZero configuration:[[WKWebViewConfiguration alloc] init]];
     wkWeb.UIDelegate = self;
@@ -104,42 +92,50 @@
     [self.view addSubview:wkWeb];
     _wkWeb = wkWeb;
 
-    // 打开逻辑:优先加载传入的 URL;否则加载上次记住的 URL;都没有则聚焦地址栏
+    // 下拉刷新(替代被移除的「刷新」按钮)
+    UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
+    [refresh addTarget:self action:@selector(reloadClick) forControlEvents:UIControlEventValueChanged];
+    wkWeb.scrollView.refreshControl = refresh;
+
+    // 打开逻辑:优先加载传入的 URL;否则加载上次记住的 URL;都没有则空白页
     NSString *savedURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastWebURL"];
     if (self.initialURLString.length > 0) {
-        _urlField.text = self.initialURLString;
         [self loadURL:self.initialURLString];
     } else if (savedURL.length > 0) {
-        _urlField.text = savedURL;
         [self loadURL:savedURL];
-    } else {
-        [_urlField becomeFirstResponder];
     }
 }
 
-// viewDidLoad 时 view.bounds 仍是全屏高度;布局完成后(导航栏之下)再统一排布地址栏/网页/控制条,避免底部按钮被裁出屏幕
+// 隐藏导航栏,由操作行「关闭」返回
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
+}
+
+// 操作行放最上方,网页填满下方(含底部安全区)
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CGFloat w = self.view.bounds.size.width;
     CGFloat h = self.view.bounds.size.height;
     CGFloat barH = 50;
-    CGFloat addrH = 44;
-    // iPhone X 等刘海屏底部 Home 指示条区域,控制条整体上移避开
+    CGFloat safeTop = self.view.safeAreaInsets.top;
     CGFloat safeBottom = self.view.safeAreaInsets.bottom;
-    CGFloat barY = h - safeBottom - barH;
 
-    _urlField.frame = CGRectMake(12, 6, w - 24, 32);
-    _wkWeb.frame = CGRectMake(0, addrH, w, barY - addrH);
-
-    // 操作行容器:覆盖到底部安全区,统一背景色;按钮居中垂直排布
-    _controlBar.frame = CGRectMake(0, barY, w, barH + safeBottom);
+    _controlBar.frame = CGRectMake(0, safeTop, w, barH);
     CGFloat space = 5;
-    CGFloat btnW = (w - 4 * space) / 5.0;   // 5 个按钮(关闭已由导航栏返回替代)
+    CGFloat btnW = (w - 6 * space) / 7.0;   // 7 个按钮(上一页/URL/主页/关闭/copy/下载/下一页)
     CGFloat btnH = barH - 12;
     for (NSInteger i = 0; i < _controlBtns.count; i++) {
         UIButton *b = _controlBtns[i];
         b.frame = CGRectMake(i * (btnW + space), (barH - btnH) / 2.0, btnW, btnH);
     }
+
+    _wkWeb.frame = CGRectMake(0, safeTop + barH, w, h - safeTop - barH - safeBottom);
 }
 
 #pragma mark - 地址栏
@@ -156,22 +152,70 @@
     }
     [_wkWeb loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:urlString]]];
     [[NSUserDefaults standardUserDefaults] setObject:urlString forKey:@"lastWebURL"];
-    _urlField.text = urlString;
-}
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if (textField == _urlField) {
-        [self loadURL:textField.text];
-        [textField resignFirstResponder];
-    }
-    return YES;
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-#pragma mark - 控制条事件
+#pragma mark - 顶部操作行事件
+
+// 主页:打开 Google
+- (void)homeClick {
+    [self loadURL:@"https://www.google.com.hk"];
+}
+
+// 关闭 WebController(返回主页)
+- (void)closeClick {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+// URL:弹窗输入网址(textview + 确定),网址有变化则加载新网址
+- (void)urlClick {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"输入网址"
+                                                                    message:nil
+                                                             preferredStyle:UIAlertControllerStyleAlert];
+    // 占位空 textField,保留标准弹窗布局(不显示)
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *tf) {
+        tf.hidden = YES;
+    }];
+
+    UITextView *tv = [[UITextView alloc] initWithFrame:CGRectZero];
+    tv.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    tv.layer.borderWidth = 0.5;
+    tv.layer.cornerRadius = 6;
+    tv.font = [UIFont systemFontOfSize:14];
+    tv.text = self.wkWeb.URL.absoluteString ?: @"";
+    tv.tag = 901;
+    [alert.view addSubview:tv];
+
+    __weak typeof(self) weakSelf = self;
+    [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        UITextView *input = (UITextView *)[alert.view viewWithTag:901];
+        NSString *newURL = [input.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *current = strongSelf.wkWeb.URL.absoluteString ?: @"";
+        // 去掉末尾斜杠再比较,只有真正变化才加载
+        NSCharacterSet *slash = [NSCharacterSet characterSetWithCharactersInString:@"/"];
+        NSString *n1 = [newURL stringByTrimmingCharactersInSet:slash];
+        NSString *n2 = [current stringByTrimmingCharactersInSet:slash];
+        if (newURL.length > 0 && ![n1 isEqualToString:n2]) {
+            [strongSelf loadURL:newURL];
+        }
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+
+    [self presentViewController:alert animated:YES completion:^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        // 弹窗布局完成后,把 textView 覆盖到输入区并聚焦
+        UITextView *input = (UITextView *)[alert.view viewWithTag:901];
+        CGFloat tw = alert.view.bounds.size.width - 32;
+        input.frame = CGRectMake(16, 60, tw, 64);
+        [input becomeFirstResponder];
+    }];
+}
 
 - (void)directedClick:(UIButton *)btn {
     if (btn.tag == 200) {
@@ -194,20 +238,36 @@
     }
 }
 
+// 刷新(下拉刷新触发;同时清空捕获的 m3u8 列表)
 - (void)reloadClick {
     [self.m3u8UrlArray removeAllObjects];
     [self.wkWeb reload];
 }
 
+// 刷新指示器收尾
+- (void)endRefresh {
+    UIRefreshControl *rc = self.wkWeb.scrollView.refreshControl;
+    if (rc && rc.refreshing) {
+        [rc endRefreshing];
+    }
+}
+
 #pragma mark - 下载(m3u8 -> mp4)
 
-- (UIButton *)downloadButton {
-    for (UIView *v in self.view.subviews) {
-        if ([v isKindOfClass:[UIButton class]] && v.tag == 203) {
+// 递归查找指定 tag 的按钮(下载按钮在 _controlBar 容器内,不在 self.view 直接子视图里)
+- (UIButton *)findButtonWithTag:(NSInteger)tag inView:(UIView *)view {
+    for (UIView *v in view.subviews) {
+        if ([v isKindOfClass:[UIButton class]] && v.tag == tag) {
             return (UIButton *)v;
         }
+        UIButton *found = [self findButtonWithTag:tag inView:v];
+        if (found) return found;
     }
     return nil;
+}
+
+- (UIButton *)downloadButton {
+    return [self findButtonWithTag:203 inView:self.view];
 }
 
 - (void)downloadClick:(UIButton *)btn {
@@ -368,7 +428,23 @@
     decisionHandler(WKNavigationActionPolicyAllow);
 }
 
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [self endRefresh];
+}
+
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [self endRefresh];
+}
+
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    [self endRefresh];
+    // 记住最新打开的网址(含页内点击跳转),供下次进入恢复
+    if (navigation) {
+        NSString *current = webView.URL.absoluteString;
+        if (current.length > 0 && ([current hasPrefix:@"http://"] || [current hasPrefix:@"https://"])) {
+            [[NSUserDefaults standardUserDefaults] setObject:current forKey:@"lastWebURL"];
+        }
+    }
     NSString *allHtml = @"document.documentElement.innerHTML";
     [webView evaluateJavaScript:allHtml completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if ([result isKindOfClass:[NSString class]]) {
