@@ -9,6 +9,8 @@
 #import "MainController.h"
 #import "EditorController.h"
 #import "ImageManagerController.h"
+#import "PhotoAlbumController.h"
+#import "VideoCollectionController.h"
 #import "SourceController.h"
 #import "WebController.h"
 
@@ -29,7 +31,7 @@
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4;
+    return 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -97,14 +99,15 @@
     UILabel *title = [cell.contentView viewWithTag:1003];
     UILabel *subtitle = [cell.contentView viewWithTag:1004];
 
-    NSArray *titles    = @[@"Editor", @"Photos", @"Source", @"Web"];
-    NSArray *subtitles = @[@"文本编辑器", @"图片管理", @"列表与阅读", @"网页浏览"];
-    NSArray *icons     = @[@"doc.text", @"photo.on.rectangle", @"list.bullet", @"globe"];
+    NSArray *titles    = @[@"Editor", @"Photos", @"Source", @"Web", @"Videos"];
+    NSArray *subtitles = @[@"文本编辑器", @"图片管理", @"列表与阅读", @"网页浏览", @"视频管理"];
+    NSArray *icons     = @[@"doc.text", @"photo.on.rectangle", @"list.bullet", @"globe", @"video.fill"];
     NSArray *colors    = @[
         [UIColor colorWithRed:0.20f green:0.47f blue:0.98f alpha:1.00f], // 蓝
         [UIColor colorWithRed:0.22f green:0.71f blue:0.42f alpha:1.00f], // 绿
         [UIColor colorWithRed:0.96f green:0.58f blue:0.13f alpha:1.00f], // 橙
         [UIColor colorWithRed:0.90f green:0.32f blue:0.29f alpha:1.00f], // 红
+        [UIColor colorWithRed:0.55f green:0.35f blue:0.80f alpha:1.00f], // 紫
     ];
 
     title.text = titles[indexPath.section];
@@ -126,8 +129,8 @@
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }
-        case 1: { // 相册
-            ImageManagerController *vc = [[ImageManagerController alloc] init];
+        case 1: { // 相册分组入口
+            PhotoAlbumController *vc = [[PhotoAlbumController alloc] init];
             vc.title = @"Photos";
             [self.navigationController pushViewController:vc animated:YES];
             break;
@@ -141,6 +144,12 @@
         case 3: { // Web
             WebController *vc = [[WebController alloc] init];
             vc.title = @"Web";
+            [self.navigationController pushViewController:vc animated:YES];
+            break;
+        }
+        case 4: { // 视频
+            VideoCollectionController *vc = [[VideoCollectionController alloc] init];
+            vc.title = @"Videos";
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }

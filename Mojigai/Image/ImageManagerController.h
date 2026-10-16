@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ImageManagerController : UIViewController
 
+/// 指定子文件夹名(可选)。nil/空 = 查看 Images 下全部图片;非空 = 只看该文件夹
+@property (nonatomic, copy, nullable) NSString *subfolderName;
+
 @end
 
 NS_ASSUME_NONNULL_END

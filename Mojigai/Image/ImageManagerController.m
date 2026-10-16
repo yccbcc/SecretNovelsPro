@@ -26,9 +26,17 @@
     self.view.backgroundColor = UIColor.whiteColor;
     // 被 push 进导航控制器:页面从导航栏之下开始,不复用自绘导航栏
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    self.imagePaths = [[ImageStore allImagePaths] mutableCopy];
+    self.imagePaths = [self loadImagePaths];
     [self configNavigationBar];
     [self configCollectionView];
+}
+
+// 按子文件夹过滤读取图片路径
+- (NSMutableArray<NSString *> *)loadImagePaths {
+    if (self.subfolderName.length > 0) {
+        return [[ImageStore imagePathsInSubfolder:self.subfolderName] mutableCopy];
+    }
+    return [[ImageStore allImagePaths] mutableCopy];
 }
 
 #pragma mark - UI
@@ -58,12 +66,36 @@
     cv.backgroundColor = UIColor.whiteColor;
     cv.dataSource = self;
     cv.delegate = self;
+    // 长按删除照片
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressCell:)];
+    [cv addGestureRecognizer:longPress];
     [cv registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"ImageCell"];
     [self.view addSubview:cv];
     self.collectionView = cv;
 }
 
 #pragma mark - 事件
+
+- (void)longPressCell:(UILongPressGestureRecognizer *)lp {
+    if (lp.state != UIGestureRecognizerStateBegan) return;
+    CGPoint p = [lp locationInView:self.collectionView];
+    NSIndexPath *ip = [self.collectionView indexPathForItemAtPoint:p];
+    if (!ip) return;
+    NSString *path = self.imagePaths[ip.item];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"删除照片" message:@"确定删除这张照片吗？" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *del = [UIAlertAction actionWithTitle:@"删除" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        if ([ImageStore deleteImageAtPath:path]) {
+            self.imagePaths = [self loadImagePaths];
+            [self.collectionView reloadData];
+        } else {
+            [TSToast show:@"删除失败"];
+        }
+    }];
+    [alert addAction:cancel];
+    [alert addAction:del];
+    [self presentViewController:alert animated:YES completion:nil];
+}
 
 - (void)backClick {
     if (self.navigationController) {
@@ -123,13 +155,19 @@
     NSInteger failed = 0;
     for (NSURL *url in urls) {
         NSError *error = nil;
-        NSString *stored = [ImageStore saveImageFromURL:url error:&error];
+        NSString *stored = nil;
+        // 有子文件夹时导入到该文件夹,否则导入到 Images 根目录
+        if (self.subfolderName.length > 0) {
+            stored = [ImageStore saveImageFromURL:url intoDirectory:[ImageStore subfolderPath:self.subfolderName] error:&error];
+        } else {
+            stored = [ImageStore saveImageFromURL:url error:&error];
+        }
         if (!stored) {
             failed++;
             NSLog(@"导入图片失败: %@", error);
         }
     }
-    self.imagePaths = [[ImageStore allImagePaths] mutableCopy];
+    self.imagePaths = [self loadImagePaths];
     [self.collectionView reloadData];
 
     if (failed == urls.count) {

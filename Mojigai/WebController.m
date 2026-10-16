@@ -12,6 +12,7 @@
 #import "HTMLTextTool.h"
 #import "ConvertVideoFormat.h"
 #import "HandleSystemFile.h"
+#import "VideoStore.h"
 #import "TSToast.h"
 
 @interface WebController () <WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate>
@@ -243,7 +244,8 @@
         UIAlertAction *action = [UIAlertAction actionWithTitle:title
                                                          style:UIAlertActionStyleDefault
                                                        handler:^(UIAlertAction * _Nonnull action) {
-            [self startConvertWithM3U8URL:urlString];
+            // 先选保存文件夹,再开始下载
+            [self chooseFolderAndDownloadM3U8:urlString button:btn];
         }];
         [sheet addAction:action];
     }
@@ -274,7 +276,34 @@
     }
 }
 
-- (void)startConvertWithM3U8URL:(NSString *)m3u8URLString {
+// 选好 m3u8 后:再让用户选择保存到 Documents/videos 下的哪个文件夹(默认 default)
+- (void)chooseFolderAndDownloadM3U8:(NSString *)m3u8URLString button:(UIButton *)btn {
+    NSArray<NSString *> *folders = [VideoStore folderNames];
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"选择保存位置"
+                                                                    message:@"保存到 Documents/videos 下的文件夹"
+                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+    for (NSString *folder in folders) {
+        NSString *title = folder;
+        if ([folder isEqualToString:@"default"]) {
+            title = @"default(默认)";
+        }
+        UIAlertAction *action = [UIAlertAction actionWithTitle:title
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+            [self startConvertWithM3U8URL:m3u8URLString targetFolder:folder];
+        }];
+        [sheet addAction:action];
+    }
+    [sheet addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    // iPad 适配:actionSheet 必须指定 popover 锚点
+    if (sheet.popoverPresentationController) {
+        sheet.popoverPresentationController.sourceView = btn;
+        sheet.popoverPresentationController.sourceRect = btn.bounds;
+    }
+    [self presentViewController:sheet animated:YES completion:nil];
+}
+
+- (void)startConvertWithM3U8URL:(NSString *)m3u8URLString targetFolder:(NSString *)folderName {
     if (m3u8URLString.length == 0) {
         return;
     }
@@ -303,10 +332,18 @@
 
         if (success) {
             NSLog(@"转换完成: %@", url.path);
-            [dlBtn setTitle:@"100%" forState:UIControlStateNormal];
-            [TSToast show:@"下载完成"];
-            [HandleSystemFile shareInstance].controller = self;
-            [[HandleSystemFile shareInstance] saveToFile:url.path];
+            // 复制到 Documents/videos/<folderName>,并清理 Caches 临时文件
+            NSError *copyError = nil;
+            NSString *targetDir = [VideoStore folderPath:folderName];
+            NSString *stored = [VideoStore saveVideoFromURL:url intoDirectory:targetDir error:&copyError];
+            [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+            if (stored) {
+                [dlBtn setTitle:@"100%" forState:UIControlStateNormal];
+                [TSToast show:@"下载完成"];
+            } else {
+                [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
+                [TSToast show:[NSString stringWithFormat:@"保存失败: %@", copyError ?: @"未知错误"]];
+            }
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [dlBtn setTitle:@"下载" forState:UIControlStateNormal];
             });
