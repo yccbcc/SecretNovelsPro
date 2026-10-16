@@ -99,15 +99,15 @@
     UILabel *title = [cell.contentView viewWithTag:1003];
     UILabel *subtitle = [cell.contentView viewWithTag:1004];
 
-    NSArray *titles    = @[@"Editor", @"Photos", @"Source", @"Web", @"Videos"];
-    NSArray *subtitles = @[@"文本编辑器", @"图片管理", @"列表与阅读", @"网页浏览", @"视频管理"];
-    NSArray *icons     = @[@"doc.text", @"photo.on.rectangle", @"list.bullet", @"globe", @"video.fill"];
+    NSArray *titles    = @[@"Editor", @"Videos", @"Photos", @"Source", @"Web"];
+    NSArray *subtitles = @[@"文本编辑器", @"视频管理", @"图片管理", @"列表与阅读", @"网页浏览"];
+    NSArray *icons     = @[@"doc.text", @"video.fill", @"photo.on.rectangle", @"list.bullet", @"globe"];
     NSArray *colors    = @[
         [UIColor colorWithRed:0.20f green:0.47f blue:0.98f alpha:1.00f], // 蓝
+        [UIColor colorWithRed:0.55f green:0.35f blue:0.80f alpha:1.00f], // 紫
         [UIColor colorWithRed:0.22f green:0.71f blue:0.42f alpha:1.00f], // 绿
         [UIColor colorWithRed:0.96f green:0.58f blue:0.13f alpha:1.00f], // 橙
         [UIColor colorWithRed:0.90f green:0.32f blue:0.29f alpha:1.00f], // 红
-        [UIColor colorWithRed:0.55f green:0.35f blue:0.80f alpha:1.00f], // 紫
     ];
 
     title.text = titles[indexPath.section];
@@ -129,27 +129,27 @@
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }
-        case 1: { // 相册分组入口
+        case 1: { // 视频
+            VideoCollectionController *vc = [[VideoCollectionController alloc] init];
+            vc.title = @"Videos";
+            [self.navigationController pushViewController:vc animated:YES];
+            break;
+        }
+        case 2: { // 相册分组入口
             PhotoAlbumController *vc = [[PhotoAlbumController alloc] init];
             vc.title = @"Photos";
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }
-        case 2: { // Source 列表
+        case 3: { // Source 列表
             SourceController *vc = [[SourceController alloc] init];
             vc.title = @"Source";
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }
-        case 3: { // Web
+        case 4: { // Web
             WebController *vc = [[WebController alloc] init];
             vc.title = @"Web";
-            [self.navigationController pushViewController:vc animated:YES];
-            break;
-        }
-        case 4: { // 视频
-            VideoCollectionController *vc = [[VideoCollectionController alloc] init];
-            vc.title = @"Videos";
             [self.navigationController pushViewController:vc animated:YES];
             break;
         }
